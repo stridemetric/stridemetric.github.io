@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1062871226528470"
-     crossorigin="anonymous"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StrideMetric — Cycling Performance Calculator</title>
@@ -564,6 +562,29 @@ body.sport-running .pace-mode-row{align-items:center;gap:6px;font-size:10px;colo
   font-size:10px;color:var(--text2);text-align:center;
   margin-top:8px;cursor:pointer;text-decoration:underline
 }
+
+/* ══ CHART TABS ══ */
+.tab-nav{
+  display:flex;gap:0;background:var(--panel2);border:1px solid var(--border2);
+  border-bottom:none;flex-wrap:wrap;
+}
+.tab-btn{
+  flex:1;min-width:100px;padding:8px 6px;font-family:'Inter',sans-serif;
+  font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  border:none;background:transparent;color:var(--text2);cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;
+  border-right:1px solid var(--border2);
+}
+.tab-btn:last-child{border-right:none}
+.tab-btn:hover{color:var(--text);border-bottom-color:var(--border)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--panel)}
+body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
+.tab-content{display:flex;flex-direction:column;gap:7px}
+/* New zoom sliders */
+.zoom-slider-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.zoom-slider-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:1px;white-space:nowrap;min-width:90px}
+.zoom-slider-val{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent2);min-width:48px;text-align:right;flex-shrink:0}
+.zoom-slider-wrap{flex:1;min-width:100px}
 </style>
 </head>
 <body>
@@ -997,118 +1018,141 @@ body.sport-running .pace-mode-row{align-items:center;gap:6px;font-size:10px;colo
   <div style="font-size:9px;color:var(--text2);margin-top:8px">Format .gpx standard — traces GPS avec altitude</div>
  </div>
 
- <!-- ZOOM CONTROL -->
- <div class="chart-container" id="zoom-container" style="display:none;padding:8px 10px">
- <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
- <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:2px">ZOOM</span>
- <button class="zoom-arrow" id="zoom-left" title="Décaler à gauche">◀</button>
- <div style="flex:1;min-width:160px;padding:0 8px">
- <div id="zoom-range-track" style="position:relative;height:28px;margin:0 2px">
- <!-- Background track -->
- <div style="position:absolute;top:12px;left:0;right:0;height:4px;background:var(--grid);border-radius:2px;pointer-events:none"></div>
- <!-- Filled section between thumbs -->
- <div id="zoom-bar-fill" style="position:absolute;top:12px;height:4px;background:linear-gradient(90deg,#3b82f6,#22d3ee);border-radius:2px;pointer-events:none"></div>
- <!-- Start thumb (left) -->
- <input type="range" id="zoom-start" min="0" max="100" value="0" step="0.5"
- class="zoom-thumb" style="position:absolute;top:0;left:0;right:0;width:100%;z-index:3">
- <!-- End thumb (right) -->
- <input type="range" id="zoom-end" min="0" max="100" value="100" step="0.5"
- class="zoom-thumb" style="position:absolute;top:0;left:0;right:0;width:100%;z-index:4">
- </div>
- <!-- Km labels under track -->
- <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text2);margin-top:0px">
- <span id="zoom-lbl-start">0 km</span>
- <span id="zoom-lbl-end">— km</span>
- </div>
- </div>
- <button class="zoom-arrow" id="zoom-right" title="Décaler à droite">▶</button>
- <button class="zoom-arrow" id="zoom-reset" title="Réinitialiser zoom" style="color:var(--accent3);border-color:var(--accent3)">⊠</button>
- </div>
- </div>
+ <!-- CHART TABS WRAPPER (shown after GPX load) -->
+ <div id="chart-tabs-wrapper" style="display:none">
 
- <!-- MAP TOGGLE + MAP TRACE -->
- <div id="map-toggle-bar" style="display:none;align-items:center;gap:8px;padding:5px 8px;background:var(--panel);border:1px solid var(--border2);border-bottom:none;font-family:'Inter',sans-serif;font-size:11px;color:var(--text2)">
- <label style="display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none">
- <div class="sw" id="sw-map" style="flex-shrink:0"></div>
- <span data-i18n="lbl_show_map">Show map</span>
- </label>
- </div>
- <div class="chart-container" id="map-chart-container" style="display:none">
- <div class="chart-header" data-i18n-chart="chart_map">MAP — COLOR BY GRADE</div>
- <canvas id="map-canvas"></canvas>
- </div>
-
- <!-- ELEVATION -->
- <div class="chart-container" id="elev-chart-container" style="display:none">
- <div class="chart-header" data-i18n="chart_elev">PROFIL ALTIMÉTRIQUE — COULEUR PAR PENTE (STYLE TDF)</div>
- <canvas id="elev-canvas"></canvas>
- <div class="grade-legend" id="grade-legend"></div>
- </div>
-
- <!-- TIMING -->
- <div class="chart-container" id="timing-container" style="display:none">
- <div class="chart-header" style="justify-content:space-between">
- <span data-i18n="chart_timing">HORAIRE DE PASSAGE PAR KILOMÈTRE</span>
- <button id="roadbook-btn" onclick="exportRoadBook()" style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;letter-spacing:1px;background:var(--panel2);border:1px solid var(--border);color:var(--text3);padding:2px 8px;cursor:pointer;transition:all .2s;border-radius:2px;white-space:nowrap" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'">📄 Road Book PDF</button>
- </div>
- <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;flex-wrap:wrap">
- <div style="display:flex;align-items:center;gap:4px">
- <span data-i18n="lbl_start" style="font-size:9px;color:var(--text2)">Departure:</span>
- <input type="time" id="start-time" value="07:00" style="background:var(--inp-bg);border:1px solid var(--border);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px 5px;outline:none">
- </div>
- <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2)">
- <span data-i18n="lbl_arrival">Estimated arrival:</span> <span id="arrival-no-pause" style="color:var(--accent)">—</span>
- &nbsp;|&nbsp; <span data-i18n="lbl_arrival_pause">With stops:</span> <span id="arrival-with-pause" style="color:var(--accent2)">—</span>
- </div>
- <div id="timing-legend" style="display:flex;gap:5px;flex-wrap:wrap;font-size:8px;font-family:'JetBrains Mono',monospace"></div>
- </div>
- <div style="display:flex;align-items:center;gap:4px">
- <button class="zoom-arrow" id="timing-scroll-left" title="Reculer">◀◀</button>
- <div class="timing-scroll" style="flex:1" id="timing-scroll-wrap"><div class="timing-table" id="timing-table"></div></div>
- <button class="zoom-arrow" id="timing-scroll-right" title="Avancer">▶▶</button>
- </div>
- </div>
-  <!-- SPEED -->
- <div class="chart-container" id="speed-chart-container" style="display:none">
- <div class="chart-header" data-i18n="chart_speed">VITESSE PAR ZONE ET KILOMÈTRE</div>
- <canvas id="speed-canvas"></canvas>
- </div>
-
- <!-- GRADE -->
- <div class="chart-container" id="grade-chart-container" style="display:none">
- <div class="chart-header" data-i18n="chart_grade">PENTE MOYENNE PAR KILOMÈTRE (%) — COULEUR STYLE TDF</div>
- <canvas id="grade-canvas"></canvas>
- </div>
-
-  <!-- HR DISTRIBUTION -->
-  <div class="chart-container" id="hr-dist-container" style="display:none">
-    <div class="chart-header" id="hr-dist-header" data-i18n="chart_hr_dist">RÉPARTITION FRÉQUENCE CARDIAQUE PAR ZONE</div>
-    <canvas id="hr-dist-canvas"></canvas>
+  <!-- ── ZOOM CONTROL ── -->
+  <div class="chart-container" id="zoom-container" style="padding:8px 10px;margin-bottom:0">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:2px">ZOOM</span>
+      <button class="zoom-arrow" id="zoom-reset" title="Réinitialiser zoom" style="color:var(--accent3);border-color:var(--accent3)">⊠</button>
+    </div>
+    <div class="zoom-slider-row">
+      <span class="zoom-slider-lbl" data-i18n="zoom_scale">Échelle</span>
+      <div class="zoom-slider-wrap">
+        <input type="range" id="zoom-scale" min="1" max="100" value="100" step="1" style="width:100%">
+      </div>
+      <span class="zoom-slider-val" id="zoom-scale-lbl">100 km</span>
+    </div>
+    <div class="zoom-slider-row">
+      <span class="zoom-slider-lbl" data-i18n="zoom_window">Fenêtre</span>
+      <div class="zoom-slider-wrap">
+        <input type="range" id="zoom-window" min="0" max="100" value="0" step="0.1" style="width:100%">
+      </div>
+      <span class="zoom-slider-val" id="zoom-window-lbl">0 km</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text2);margin-top:2px">
+      <span id="zoom-lbl-start">0 km</span>
+      <span id="zoom-lbl-end">— km</span>
+    </div>
   </div>
 
-  <!-- PACE/POWER DISTRIBUTION -->
-  <div class="chart-container" id="pace-dist-container" style="display:none">
-    <div class="chart-header" id="pace-dist-header" data-i18n="chart_pace_dist">RÉPARTITION ALLURE PAR ZONE</div>
-    <canvas id="pace-dist-canvas"></canvas>
+  <!-- ── TAB NAVIGATION ── -->
+  <div class="tab-nav" id="tab-nav">
+    <button class="tab-btn active" data-tab="profile" data-i18n="tab_profile">PROFIL DE SORTIE</button>
+    <button class="tab-btn" data-tab="physio" data-i18n="tab_physio">RÉSULTATS PHYSIOLOGIQUES</button>
+    <button class="tab-btn" data-tab="nutrition" data-i18n="tab_nutrition">NUTRITION - HYDRATATION</button>
   </div>
 
-  <!-- NUTRITION TABLE -->
-  <div class="chart-container" id="nutr-table-container" style="display:none">
-    <div class="chart-header" id="nutr-table-header">RÉSUMÉ NUTRITION</div>
-    <div id="nutr-table-content" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text);overflow-x:auto"></div>
-  </div>
+  <!-- ══ TAB 1: PROFIL DE SORTIE ══ -->
+  <div id="tab-profile" class="tab-content">
 
-  <!-- HYDRATION TABLE -->
-  <div class="chart-container" id="hydra-table-container" style="display:none">
-    <div class="chart-header" id="hydra-table-header">RÉSUMÉ HYDRATATION</div>
-    <div id="hydra-table-content" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text);overflow-x:auto"></div>
-  </div>
+    <!-- MAP TOGGLE + MAP TRACE -->
+    <div id="map-toggle-bar" style="display:none;align-items:center;gap:8px;padding:5px 8px;background:var(--panel);border:1px solid var(--border2);border-bottom:none;font-family:'Inter',sans-serif;font-size:11px;color:var(--text2)">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none">
+        <div class="sw" id="sw-map" style="flex-shrink:0"></div>
+        <span data-i18n="lbl_show_map">Show map</span>
+      </label>
+    </div>
+    <div class="chart-container" id="map-chart-container" style="display:none">
+      <div class="chart-header" data-i18n-chart="chart_map">MAP — COLOR BY GRADE</div>
+      <canvas id="map-canvas"></canvas>
+    </div>
 
-  <!-- CLIMB LIST -->
-  <div class="chart-container" id="climb-list-container" style="display:none">
-    <div class="chart-header" id="climb-list-header">ASCENSIONS</div>
-    <div id="climb-list-body" style="font-family:'JetBrains Mono',monospace;font-size:10px;overflow-x:auto"></div>
-  </div>
+    <!-- PROFIL ALTIMÉTRIQUE -->
+    <div class="chart-container" id="elev-chart-container" style="display:none">
+      <div class="chart-header" data-i18n="chart_elev">PROFIL ALTIMÉTRIQUE — COULEUR PAR PENTE (STYLE TDF)</div>
+      <canvas id="elev-canvas"></canvas>
+      <div class="grade-legend" id="grade-legend"></div>
+    </div>
+
+    <!-- VITESSE PAR ZONE -->
+    <div class="chart-container" id="speed-chart-container" style="display:none">
+      <div class="chart-header" data-i18n="chart_speed">VITESSE PAR ZONE ET KILOMÈTRE</div>
+      <canvas id="speed-canvas"></canvas>
+    </div>
+
+    <!-- HORAIRE DE PASSAGE PAR KILOMÈTRE -->
+    <div class="chart-container" id="timing-container" style="display:none">
+      <div class="chart-header" style="justify-content:space-between">
+        <span data-i18n="chart_timing">HORAIRE DE PASSAGE PAR KILOMÈTRE</span>
+        <button id="roadbook-btn" onclick="exportRoadBook()" style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;letter-spacing:1px;background:var(--panel2);border:1px solid var(--border);color:var(--text3);padding:2px 8px;cursor:pointer;transition:all .2s;border-radius:2px;white-space:nowrap" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'" data-i18n="btn_roadbook">📄 Road Book PDF</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:4px">
+          <span data-i18n="lbl_start" style="font-size:9px;color:var(--text2)">Departure:</span>
+          <input type="time" id="start-time" value="07:00" style="background:var(--inp-bg);border:1px solid var(--border);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px 5px;outline:none">
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2)">
+          <span data-i18n="lbl_arrival">Estimated arrival:</span> <span id="arrival-no-pause" style="color:var(--accent)">—</span>
+          &nbsp;|&nbsp; <span data-i18n="lbl_arrival_pause">With stops:</span> <span id="arrival-with-pause" style="color:var(--accent2)">—</span>
+        </div>
+        <div id="timing-legend" style="display:flex;gap:5px;flex-wrap:wrap;font-size:8px;font-family:'JetBrains Mono',monospace"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <button class="zoom-arrow" id="timing-scroll-left" title="Reculer">◀◀</button>
+        <div class="timing-scroll" style="flex:1" id="timing-scroll-wrap"><div class="timing-table" id="timing-table"></div></div>
+        <button class="zoom-arrow" id="timing-scroll-right" title="Avancer">▶▶</button>
+      </div>
+    </div>
+
+    <!-- ASCENSIONS DÉTECTÉES -->
+    <div class="chart-container" id="climb-list-container" style="display:none">
+      <div class="chart-header" id="climb-list-header">ASCENSIONS DÉTECTÉES</div>
+      <div id="climb-list-body" style="overflow-x:auto"></div>
+    </div>
+
+    <!-- KILOMÈTRE PENTE MOYENNE PAR KILOMÈTRE (per-climb charts) -->
+    <div id="climb-grade-charts-container" style="display:none;flex-direction:column;gap:7px"></div>
+
+  </div><!-- end tab-profile -->
+
+  <!-- ══ TAB 2: RÉSULTATS PHYSIOLOGIQUES ══ -->
+  <div id="tab-physio" class="tab-content" style="display:none">
+
+    <!-- HR DISTRIBUTION -->
+    <div class="chart-container" id="hr-dist-container">
+      <div class="chart-header" id="hr-dist-header" data-i18n="chart_hr_dist">RÉPARTITION FRÉQUENCE CARDIAQUE PAR ZONE</div>
+      <canvas id="hr-dist-canvas"></canvas>
+    </div>
+
+    <!-- PACE/POWER DISTRIBUTION -->
+    <div class="chart-container" id="pace-dist-container">
+      <div class="chart-header" id="pace-dist-header" data-i18n="chart_pace_dist">RÉPARTITION ALLURE PAR ZONE</div>
+      <canvas id="pace-dist-canvas"></canvas>
+    </div>
+
+  </div><!-- end tab-physio -->
+
+  <!-- ══ TAB 3: NUTRITION - HYDRATATION ══ -->
+  <div id="tab-nutrition" class="tab-content" style="display:none">
+
+    <!-- NUTRITION TABLE -->
+    <div class="chart-container" id="nutr-table-container">
+      <div class="chart-header" id="nutr-table-header">RÉSUMÉ NUTRITION</div>
+      <div id="nutr-table-content" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text);overflow-x:auto"></div>
+    </div>
+
+    <!-- HYDRATION TABLE -->
+    <div class="chart-container" id="hydra-table-container">
+      <div class="chart-header" id="hydra-table-header">RÉSUMÉ HYDRATATION</div>
+      <div id="hydra-table-content" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text);overflow-x:auto"></div>
+    </div>
+
+  </div><!-- end tab-nutrition -->
+
+ </div><!-- end chart-tabs-wrapper -->
+
 </div>
 </div><!-- end main-layout -->
 
@@ -1170,20 +1214,19 @@ const TDF=[
 function gradeColor(g){for(const t of TDF)if(g<t.max)return t.color;return '#cc00cc';}
 
 // 5-zone FTP definitions
-const ZONE5=[
- {z:1,name:'Récup.', pct:[0,55], color:'#4a9eff',hrPct:[0,60]},
- {z:2,name:'Endurance', pct:[55,75], color:'#4ae870',hrPct:[60,70]},
- {z:3,name:'Tempo', pct:[75,90], color:'#ffd700',hrPct:[70,80]},
- {z:4,name:'Seuil', pct:[90,105],color:'#ff8c00',hrPct:[80,90]},
- {z:5,name:'VO2max', pct:[105,150],color:'#ff2040',hrPct:[90,100]},
-];
-// 3-zone SV1/SV2
-const ZONE3=[
- {z:1,name:'Zone 1 (<SV1)',pct:[0,75], color:'#4a9eff',hrPct:[0,70]},
- {z:2,name:'Zone 2 (SV1-SV2)',pct:[75,105],color:'#ffd700',hrPct:[70,90]},
- {z:3,name:'Zone 3 (>SV2)',pct:[105,150],color:'#ff2040',hrPct:[90,100]},
-];
-function getZoneDefs(){return pwrModel==='3z'?ZONE3:ZONE5;}
+function getZone5(){ return [
+ {z:1,name:t('pwr_z1'), pct:[0,55], color:'#4a9eff',hrPct:[0,60]},
+ {z:2,name:t('pwr_z2'), pct:[55,75], color:'#4ae870',hrPct:[60,70]},
+ {z:3,name:t('pwr_z3'), pct:[75,90], color:'#ffd700',hrPct:[70,80]},
+ {z:4,name:t('pwr_z4'), pct:[90,105],color:'#ff8c00',hrPct:[80,90]},
+ {z:5,name:t('pwr_z5'), pct:[105,150],color:'#ff2040',hrPct:[90,100]},
+];}
+function getZone3(){ return [
+ {z:1,name:t('pwr3_z1'),pct:[0,75], color:'#4a9eff',hrPct:[0,70]},
+ {z:2,name:t('pwr3_z2'),pct:[75,105],color:'#ffd700',hrPct:[70,90]},
+ {z:3,name:t('pwr3_z3'),pct:[105,150],color:'#ff2040',hrPct:[90,100]},
+];}
+function getZoneDefs(){return pwrModel==='3z'?getZone3():getZone5();}
 
 // ══════════════════════════════════════════════════
 // HELPERS
@@ -1342,11 +1385,11 @@ function getHikingZoneFromPower(P, vKmh, gradePct){
 
   const pctMax = hr / hrMax * 100;
   const zones = [
-    {z:1,name:'Z1 Aisé',    color:'#3b82f6', pct:[0,60]},
-    {z:2,name:'Z2 Modéré',  color:'#4ae870', pct:[60,70]},
-    {z:3,name:'Z3 Aérobie', color:'#ffd700', pct:[70,80]},
-    {z:4,name:'Z4 Seuil',   color:'#ff8c00', pct:[80,90]},
-    {z:5,name:'Z5 Max',     color:'#ff2040', pct:[90,110]},
+    {z:1,name:t('hr_z1'),color:'#3b82f6', pct:[0,60]},
+    {z:2,name:t('hr_z2'),color:'#4ae870', pct:[60,70]},
+    {z:3,name:t('hr_z3'),color:'#ffd700', pct:[70,80]},
+    {z:4,name:t('hr_z4'),color:'#ff8c00', pct:[80,90]},
+    {z:5,name:t('hr_z5'),color:'#ff2040', pct:[90,110]},
   ];
   const zoneObj = zones.find(z => pctMax >= z.pct[0] && pctMax < z.pct[1]) || zones[0];
   // Attach computed HR so getHRforZone can use it directly
@@ -1369,9 +1412,10 @@ function hrForZone(z){
  [100, 106], // Z5
  ];
  // Map zone index (z.z-1) to LTHR %
- const defs=getZoneDefs();
- const idx=defs.indexOf(z);
- const nz=defs.length;
+ // Use z.z (zone number 1-5) directly: defs.indexOf(z) always returns -1 because
+ // getZoneDefs() creates new objects each call, so object-identity lookup fails.
+ const nz=pwrModel==='3z'?3:5;
+ const idx=(z.z||1)-1;
  let pctRange;
  if(nz===3){
  // 3-zone: Z1<81, Z2=81-99, Z3=100+
@@ -1716,12 +1760,16 @@ function calcRoute(){
  drawAllCharts(segs); // première passe (peut avoir width=0 si containers venaient d'être montrés)
 
  document.getElementById('empty-state').style.display='none';
- ['zoom-container','map-toggle-bar','elev-chart-container','timing-container',
- 'speed-chart-container','grade-chart-container','hr-dist-container','nutr-table-container','hydra-table-container','climb-list-container']
- .forEach(id=>document.getElementById(id).style.display='');
- // pace-dist only for cycling and running
- const pdC=document.getElementById('pace-dist-container');
- if(pdC) pdC.style.display=(currentSport==='hiking')?'none':'';
+ document.getElementById('chart-tabs-wrapper').style.display='';
+ // Init zoom if not done yet
+ if(typeof initNewZoom==='function' && gpxData) initNewZoom(gpxData.totalDist);
+ // Show climb-list and climb-grade containers
+ ['elev-chart-container','timing-container','speed-chart-container'].forEach(id=>{
+   const el=document.getElementById(id);if(el)el.style.display='';
+ });
+ // map-toggle-bar
+ const mtb=document.getElementById('map-toggle-bar');
+ if(mtb) mtb.style.display='flex';
  // Map: show only if switch is ON
  document.getElementById('map-chart-container').style.display=
  document.getElementById('sw-map').classList.contains('on')?'':'none';
@@ -1740,10 +1788,7 @@ function getZoomKm(){
  hi:total*zoomEnd/100
  };
 }
-function updateZoomLabel(){
- // Labels now updated in syncZoomThumbs
- syncZoomThumbs();
-}
+function updateZoomLabel(){ applyNewZoom(); }
 
 // ══════════════════════════════════════════════════
 //  ZONE DISTRIBUTION CALCULATION
@@ -1758,12 +1803,14 @@ function computeZoneDistribution(segs){
   const hrRest = getHRrest();
   // Karvonen (HRR) boundaries — gives realistic Z2 population
   // Z1: < 60% HRR, Z2: 60-70%, Z3: 70-80%, Z4: 80-90%, Z5: >90%
-  const HRR = Math.max(1, hrMax - hrRest);
+  // Use %HRmax thresholds — matches the zone boundaries displayed in the HR chart
+  // (chart uses hrZonePcts [[0,60],[60,70],[70,80],[80,90],[90,100]] × HRmax)
   function hrToZone(bpm){
-    if(bpm < hrRest + 0.60*HRR) return 1;
-    if(bpm < hrRest + 0.70*HRR) return 2;
-    if(bpm < hrRest + 0.80*HRR) return 3;
-    if(bpm < hrRest + 0.90*HRR) return 4;
+    const pct = bpm / hrMax * 100;
+    if(pct < 60) return 1;
+    if(pct < 70) return 2;
+    if(pct < 80) return 3;
+    if(pct < 90) return 4;
     return 5;
   }
 
@@ -1818,7 +1865,7 @@ function drawHRDistChart(segs){
   // Colors match reference images: cyan/green/yellow/orange/red
   const hrMax = getHRmax(), hrRest = getHRrest();
   const hrZoneColors = ['#40b8d8','#4ae870','#ffd700','#ff8c00','#ff2040'];
-  const hrZoneNames = ['Récupération','Aérobie (endur.)','Aérobie (puiss.)','Seuil','Anaérobie'];
+  const hrZoneNames = [t('hrd_z1'),t('hrd_z2'),t('hrd_z3'),t('hrd_z4'),t('hrd_z5')];
   const hrZonePcts = [[0,60],[60,70],[70,80],[80,90],[90,100]];
   const zones = hrZoneColors.map((c,i)=>({
     z:i+1, name:hrZoneNames[i], color:c,
@@ -2017,7 +2064,8 @@ function drawAllCharts(segs){
  drawHydrationTable(segs);
  const totMin=segs.reduce((a,s)=>a+s.timeMins,0);
  updateHydraAutoDisplay(totMin);
- drawGradeChart(segs);
+ // Climb grade charts (per ascension)
+ if(window._lastClimbs) drawClimbGradeCharts(window._lastClimbs);
 }
 
 // ══════════════════════════════════════════════════
@@ -2546,9 +2594,9 @@ function optMaxCalories(){
   let zones;
   if(sport==='running') zones = getRunningZoneDefs ? getRunningZoneDefs() : getZoneDefs();
   else if(sport==='hiking') zones = (function(){
-    return [{z:1,name:'Z1 Aisé',color:'#3b82f6'},{z:2,name:'Z2 Modéré',color:'#4ae870'},
-            {z:3,name:'Z3 Aérobie',color:'#ffd700'},{z:4,name:'Z4 Seuil',color:'#ff8c00'},
-            {z:5,name:'Z5 Max',color:'#ff2040'}];
+    return [{z:1,name:t('hr_z1'),color:'#3b82f6'},{z:2,name:t('hr_z2'),color:'#4ae870'},
+            {z:3,name:t('hr_z3'),color:'#ffd700'},{z:4,name:t('hr_z4'),color:'#ff8c00'},
+            {z:5,name:t('hr_z5'),color:'#ff2040'}];
   })();
   else zones = getZoneDefs();
 
@@ -2616,11 +2664,11 @@ function runOptimizer(){
   let defs;
   if(isRunning) defs = getRunningZoneDefs ? getRunningZoneDefs() : getZoneDefs();
   else if(isHiking) defs = [
-    {z:1,name:'Z1 Aisé',color:'#3b82f6',pct:[0,60]},
-    {z:2,name:'Z2 Modéré',color:'#4ae870',pct:[60,70]},
-    {z:3,name:'Z3 Aérobie',color:'#ffd700',pct:[70,80]},
-    {z:4,name:'Z4 Seuil',color:'#ff8c00',pct:[80,90]},
-    {z:5,name:'Z5 Max',color:'#ff2040',pct:[90,110]},
+    {z:1,name:t('hr_z1'),color:'#3b82f6',pct:[0,60]},
+    {z:2,name:t('hr_z2'),color:'#4ae870',pct:[60,70]},
+    {z:3,name:t('hr_z3'),color:'#ffd700',pct:[70,80]},
+    {z:4,name:t('hr_z4'),color:'#ff8c00',pct:[80,90]},
+    {z:5,name:t('hr_z5'),color:'#ff2040',pct:[90,110]},
   ];
   else defs = getZoneDefs();
 
@@ -3058,82 +3106,88 @@ if(window.ResizeObserver){
 window.addEventListener('resize',()=>{if(gpxData)drawAllCharts(segCalcCache);});
 
 // ══════════════════════════════════════════════════
-// ZOOM WIRING — independent dual-range with z-index priority
+// ZOOM — 2 curseurs : Échelle + Fenêtre
 // ══════════════════════════════════════════════════
-function syncZoomThumbs(){
- // Enforce: start <= end with minimum 1% window
- if(zoomStart>zoomEnd-1)zoomEnd=Math.min(100,zoomStart+1);
- if(zoomEnd<zoomStart+1)zoomStart=Math.max(0,zoomEnd-1);
- document.getElementById('zoom-start').value=zoomStart;
- document.getElementById('zoom-end').value=zoomEnd;
 
- // Update fill bar
- const fill=document.getElementById('zoom-bar-fill');
- fill.style.left=zoomStart+'%';
- fill.style.width=(zoomEnd-zoomStart)+'%';
+function initNewZoom(totalKm) {
+  const scaleEl = document.getElementById('zoom-scale');
+  const windowEl = document.getElementById('zoom-window');
+  if (!scaleEl || !windowEl) return;
 
- // Update km labels
- if(gpxData){
- const total=gpxData.totalDist;
- const lo=(total*zoomStart/100).toFixed(1);
- const hi=(total*zoomEnd/100).toFixed(1);
- document.getElementById('zoom-lbl-start').textContent=lo+' km';
- document.getElementById('zoom-lbl-end').textContent=hi+' km';
- }
+  const maxKm = Math.ceil(totalKm);
+  scaleEl.max  = maxKm;
+  scaleEl.min  = 1;
+  // Valeur initiale : tout afficher
+  scaleEl.value  = maxKm;
 
- // z-index: give start higher z when start>= 98 (both at right edge) or on proximity
- const startEl=document.getElementById('zoom-start');
- const endEl=document.getElementById('zoom-end');
- if(zoomStart>=98){
- startEl.style.zIndex=5;endEl.style.zIndex=4;
- } else {
- startEl.style.zIndex=3;endEl.style.zIndex=4;
- }
+  windowEl.max   = maxKm;
+  windowEl.min   = 0;
+  windowEl.step  = Math.max(0.1, totalKm / 1000);
+  windowEl.value = 0;
 
- if(segCalcCache)drawAllCharts(segCalcCache);
+  zoomStart = 0;
+  zoomEnd   = 100;
+  _updateZoomLabels(totalKm, maxKm, 0);
 }
 
-// On mousedown / touchstart: determine which thumb is closer to click and raise its z-index
-document.getElementById('zoom-range-track').addEventListener('pointerdown',e=>{
- const track=document.getElementById('zoom-range-track');
- const rect=track.getBoundingClientRect();
- const pct=clamp((e.clientX-rect.left)/rect.width*100,0,100);
- const distStart=Math.abs(pct-zoomStart);
- const distEnd=Math.abs(pct-zoomEnd);
- const startEl=document.getElementById('zoom-start');
- const endEl=document.getElementById('zoom-end');
- if(distStart<=distEnd){
- startEl.style.zIndex=6;endEl.style.zIndex=4;
- } else {
- startEl.style.zIndex=4;endEl.style.zIndex=6;
- }
-});
+function _updateZoomLabels(total, scale, win) {
+  const scaleLbl  = document.getElementById('zoom-scale-lbl');
+  const windowLbl = document.getElementById('zoom-window-lbl');
+  const loLbl     = document.getElementById('zoom-lbl-start');
+  const hiLbl     = document.getElementById('zoom-lbl-end');
+  if (scaleLbl)  scaleLbl.textContent  = parseFloat(scale).toFixed(0) + ' km';
+  if (windowLbl) windowLbl.textContent = parseFloat(win).toFixed(1) + ' km';
+  const lo = parseFloat(win);
+  const hi = Math.min(total, lo + parseFloat(scale));
+  if (loLbl) loLbl.textContent = lo.toFixed(1) + ' km';
+  if (hiLbl) hiLbl.textContent = hi.toFixed(1) + ' km';
+}
 
-document.getElementById('zoom-start').addEventListener('input',e=>{
- zoomStart=Math.min(parseFloat(e.target.value),zoomEnd-1);
- syncZoomThumbs();
-});
-document.getElementById('zoom-end').addEventListener('input',e=>{
- zoomEnd=Math.max(parseFloat(e.target.value),zoomStart+1);
- syncZoomThumbs();
-});
-document.getElementById('zoom-reset').addEventListener('click',()=>{
- zoomStart=0;zoomEnd=100;syncZoomThumbs();
-});
-document.getElementById('zoom-left').addEventListener('click',()=>{
- const span=zoomEnd-zoomStart;
- const shift=Math.max(1,span*0.2);
- zoomStart=Math.max(0,zoomStart-shift);
- zoomEnd=zoomStart+span;
- syncZoomThumbs();
-});
-document.getElementById('zoom-right').addEventListener('click',()=>{
- const span=zoomEnd-zoomStart;
- const shift=Math.max(1,span*0.2);
- zoomEnd=Math.min(100,zoomEnd+shift);
- zoomStart=zoomEnd-span;
- syncZoomThumbs();
-});
+function applyNewZoom() {
+  if (!gpxData) return;
+  const total    = gpxData.totalDist;
+  const scaleEl  = document.getElementById('zoom-scale');
+  const windowEl = document.getElementById('zoom-window');
+  if (!scaleEl || !windowEl) return;
+
+  const scale = parseFloat(scaleEl.value);
+  const maxWin = Math.max(0, total - scale);
+  let win = parseFloat(windowEl.value);
+  if (win > maxWin) { win = maxWin; windowEl.value = win; }
+
+  zoomStart = (win / total) * 100;
+  zoomEnd   = Math.min(100, ((win + scale) / total) * 100);
+
+  _updateZoomLabels(total, scale, win);
+
+  // Mettre à jour le CSS fill du slider d'échelle
+  const pctScale = ((scale - 1) / (parseFloat(scaleEl.max) - 1) * 100).toFixed(1);
+  scaleEl.style.setProperty('--pct', pctScale + '%');
+  const pctWin = (maxWin > 0 ? (win / maxWin) * 100 : 0).toFixed(1);
+  windowEl.style.setProperty('--pct', pctWin + '%');
+
+  if (segCalcCache) drawAllCharts(segCalcCache);
+}
+
+(function() {
+  const scaleEl  = document.getElementById('zoom-scale');
+  const windowEl = document.getElementById('zoom-window');
+  const resetBtn = document.getElementById('zoom-reset');
+  if (scaleEl)  scaleEl.addEventListener('input',  applyNewZoom);
+  if (windowEl) windowEl.addEventListener('input', applyNewZoom);
+  if (resetBtn) resetBtn.addEventListener('click', () => {
+    if (!gpxData) return;
+    const total = gpxData.totalDist;
+    const scaleEl2 = document.getElementById('zoom-scale');
+    const windowEl2 = document.getElementById('zoom-window');
+    if (scaleEl2)  scaleEl2.value  = Math.ceil(total);
+    if (windowEl2) windowEl2.value = 0;
+    applyNewZoom();
+  });
+})();
+
+// Stub pour compatibilité (n'est plus utilisée mais appelée depuis updateZoomLabel)
+function syncZoomThumbs(){ applyNewZoom(); }
 
 // ══════════════════════════════════════════════════
 // TIMING SCROLL BUTTONS
@@ -3339,7 +3393,50 @@ const I18N={
   'climb_col_start':'Start',
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
-  'climb_col_grade':'Avg grade'
+  'climb_col_grade':'Avg grade'  ,
+  'climb_col_km_start':'Start km',
+  'climb_col_km_end':'End km',
+  'climb_col_alt_start':'Start alt.',
+  'climb_col_alt_end':'End alt.',
+  'chart_climb_grade':'GRADE PER 100m — CLIMB',
+  'climb_legend_title':'LEGEND',
+  'climb_legend_0':'0 to 2.9%',
+  'climb_legend_3':'3 to 5.9%',
+  'climb_legend_6':'6 to 8.9%',
+  'climb_legend_9':'9%+',
+  'climb_pct_label':'Avg % per km',
+  'climb_ascent_label':'ASCENT',
+  'climb_start_word':'Start',
+  'climb_at_word':' at ',
+  'tab_profile':'Outing Profile',
+  'tab_physio':'Physiological Results',
+  'tab_nutrition':'Nutrition — Hydration',
+  'zoom_scale':'Scale',
+  'zoom_window':'Window',
+  'pwr_z1':'Recovery',
+  'pwr_z2':'Endurance',
+  'pwr_z3':'Tempo',
+  'pwr_z4':'Threshold',
+  'pwr_z5':'VO₂max',
+  'pwr3_z1':'Zone 1 (<VT1)',
+  'pwr3_z2':'Zone 2 (VT1-VT2)',
+  'pwr3_z3':'Zone 3 (>VT2)',
+  'hr_z1':'Z1 Easy',
+  'hr_z2':'Z2 Moderate',
+  'hr_z3':'Z3 Aerobic',
+  'hr_z4':'Z4 Threshold',
+  'hr_z5':'Z5 Max',
+  'hrd_z1':'Recovery',
+  'hrd_z2':'Aerobic (endur.)',
+  'hrd_z3':'Aerobic (power)',
+  'hrd_z4':'Threshold',
+  'hrd_z5':'Anaerobic',
+  'run_z1':'Endurance',
+  'run_z2':'Aero. threshold',
+  'run_z3':'Threshold',
+  'run_z4':'Speed',
+  'run_z5':'Sprint',
+  'btn_roadbook':'📄 Road Book PDF'
   },
   fr:{
   btn_gpx:'⊕ GPX',no_file:'— AUCUN FICHIER CHARGÉ —',
@@ -3528,7 +3625,50 @@ const I18N={
   'climb_col_start':'Début',
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
-  'climb_col_grade':'Pente moy.'
+  'climb_col_grade':'Pente moy.'  ,
+  'climb_col_km_start':'Km début',
+  'climb_col_km_end':'Km fin',
+  'climb_col_alt_start':'Alt. début',
+  'climb_col_alt_end':'Alt. fin',
+  'chart_climb_grade':'PENTE PAR 100m — ASCENSION',
+  'climb_legend_title':'LÉGENDE',
+  'climb_legend_0':'De 0 à 2,9%',
+  'climb_legend_3':'De 3 à 5,9%',
+  'climb_legend_6':'De 6 à 8,9%',
+  'climb_legend_9':'À partir de 9%',
+  'climb_pct_label':'Pourcentage moyen par km',
+  'climb_ascent_label':'ASCENSION',
+  'climb_start_word':'Départ',
+  'climb_at_word':' à ',
+  'tab_profile':'Profil de sortie',
+  'tab_physio':'Résultats physiologiques',
+  'tab_nutrition':'Nutrition — Hydratation',
+  'zoom_scale':'Échelle',
+  'zoom_window':'Fenêtre',
+  'pwr_z1':'Récup.',
+  'pwr_z2':'Endurance',
+  'pwr_z3':'Tempo',
+  'pwr_z4':'Seuil',
+  'pwr_z5':'VO₂max',
+  'pwr3_z1':'Zone 1 (<SV1)',
+  'pwr3_z2':'Zone 2 (SV1-SV2)',
+  'pwr3_z3':'Zone 3 (>SV2)',
+  'hr_z1':'Z1 Aisé',
+  'hr_z2':'Z2 Modéré',
+  'hr_z3':'Z3 Aérobie',
+  'hr_z4':'Z4 Seuil',
+  'hr_z5':'Z5 Max',
+  'hrd_z1':'Récupération',
+  'hrd_z2':'Aérobie (endur.)',
+  'hrd_z3':'Aérobie (puiss.)',
+  'hrd_z4':'Seuil',
+  'hrd_z5':'Anaérobie',
+  'run_z1':'Endurance',
+  'run_z2':'Seuil aéro.',
+  'run_z3':'Seuil',
+  'run_z4':'Vitesse',
+  'run_z5':'Sprint',
+  'btn_roadbook':'📄 Road Book PDF'
   },
   de:{
   btn_gpx:'⊕ GPX',no_file:'— KEINE DATEI GELADEN —',
@@ -3717,7 +3857,50 @@ const I18N={
   'climb_col_start':'Start',
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
-  'climb_col_grade':'Ø Steigung'
+  'climb_col_grade':'Ø Steigung'  ,
+  'climb_col_km_start':'Start km',
+  'climb_col_km_end':'Ende km',
+  'climb_col_alt_start':'Start Höhe',
+  'climb_col_alt_end':'End Höhe',
+  'chart_climb_grade':'STEIGUNG PRO 100m — ANSTIEG',
+  'climb_legend_title':'LEGENDE',
+  'climb_legend_0':'0 bis 2,9%',
+  'climb_legend_3':'3 bis 5,9%',
+  'climb_legend_6':'6 bis 8,9%',
+  'climb_legend_9':'Ab 9%',
+  'climb_pct_label':'Ø % pro km',
+  'climb_ascent_label':'ANSTIEG',
+  'climb_start_word':'Start',
+  'climb_at_word':' bei ',
+  'tab_profile':'Streckenprofil',
+  'tab_physio':'Physiolog. Ergebnisse',
+  'tab_nutrition':'Ernährung — Hydration',
+  'zoom_scale':'Maßstab',
+  'zoom_window':'Fenster',
+  'pwr_z1':'Erholung',
+  'pwr_z2':'Grundlage',
+  'pwr_z3':'Tempo',
+  'pwr_z4':'Schwelle',
+  'pwr_z5':'VO₂max',
+  'pwr3_z1':'Zone 1 (<VT1)',
+  'pwr3_z2':'Zone 2 (VT1-VT2)',
+  'pwr3_z3':'Zone 3 (>VT2)',
+  'hr_z1':'Z1 Leicht',
+  'hr_z2':'Z2 Moderat',
+  'hr_z3':'Z3 Aerob',
+  'hr_z4':'Z4 Schwelle',
+  'hr_z5':'Z5 Max',
+  'hrd_z1':'Erholung',
+  'hrd_z2':'Aerob (Ausdauer)',
+  'hrd_z3':'Aerob (Kraft)',
+  'hrd_z4':'Schwelle',
+  'hrd_z5':'Anaerob',
+  'run_z1':'Grundlage',
+  'run_z2':'Aerobe Schw.',
+  'run_z3':'Schwelle',
+  'run_z4':'Geschw.',
+  'run_z5':'Sprint',
+  'btn_roadbook':'📄 Road Book PDF'
   },
   es:{
   btn_gpx:'⊕ GPX',no_file:'— NINGÚN ARCHIVO CARGADO —',
@@ -3906,7 +4089,32 @@ const I18N={
   'climb_col_start':'Inicio',
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
-  'climb_col_grade':'Pend. media'
+  'climb_col_grade':'Pend. media',
+  'climb_col_km_start':'Km inicio','climb_col_km_end':'Km fin','climb_col_alt_start':'Alt. inicio','climb_col_alt_end':'Alt. fin','chart_climb_grade':'PENDIENTE — ASCENSO','climb_legend_title':'LEYENDA','climb_legend_0':'De 0 a 2,9%','climb_legend_3':'De 3 a 5,9%','climb_legend_6':'De 6 a 8,9%','climb_legend_9':'A partir de 9%','climb_pct_label':'% medio por km','climb_ascent_label':'ASCENSO','climb_start_word':'Inicio','climb_at_word':' a ','tab_profile':'Perfil de salida','tab_physio':'Resultados fisiológicos','tab_nutrition':'Nutrición — Hidratación','zoom_scale':'Escala','zoom_window':'Ventana',
+  'pwr_z1':'Recuperación',
+  'pwr_z2':'Resistencia',
+  'pwr_z3':'Tempo',
+  'pwr_z4':'Umbral',
+  'pwr_z5':'VO₂max',
+  'pwr3_z1':'Zona 1 (<VT1)',
+  'pwr3_z2':'Zona 2 (VT1-VT2)',
+  'pwr3_z3':'Zona 3 (>VT2)',
+  'hr_z1':'Z1 Fácil',
+  'hr_z2':'Z2 Moderado',
+  'hr_z3':'Z3 Aeróbico',
+  'hr_z4':'Z4 Umbral',
+  'hr_z5':'Z5 Max',
+  'hrd_z1':'Recuperación',
+  'hrd_z2':'Aeróbico (resist.)',
+  'hrd_z3':'Aeróbico (pot.)',
+  'hrd_z4':'Umbral',
+  'hrd_z5':'Anaeróbico',
+  'run_z1':'Resistencia',
+  'run_z2':'Umbral aero.',
+  'run_z3':'Umbral',
+  'run_z4':'Velocidad',
+  'run_z5':'Sprint',
+  'btn_roadbook':'📄 Road Book PDF'
   },
   it:{
   btn_gpx:'⊕ GPX',no_file:'— NESSUN FILE CARICATO —',
@@ -4095,7 +4303,32 @@ const I18N={
   'climb_col_start':'Inizio',
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
-  'climb_col_grade':'Pend. media'
+  'climb_col_grade':'Pend. media',
+  'climb_col_km_start':'Km inizio','climb_col_km_end':'Km fine','climb_col_alt_start':'Alt. inizio','climb_col_alt_end':'Alt. fine','chart_climb_grade':'PENDENZA — SALITA','climb_legend_title':'LEGENDA','climb_legend_0':'Da 0 a 2,9%','climb_legend_3':'Da 3 a 5,9%','climb_legend_6':'Da 6 a 8,9%','climb_legend_9':'Dal 9%','climb_pct_label':'% media per km','climb_ascent_label':'SALITA','climb_start_word':'Partenza','climb_at_word':' a ','tab_profile':'Profilo uscita','tab_physio':'Risultati fisiologici','tab_nutrition':'Nutrizione — Idratazione','zoom_scale':'Scala','zoom_window':'Finestra',
+  'pwr_z1':'Recupero',
+  'pwr_z2':'Resistenza',
+  'pwr_z3':'Tempo',
+  'pwr_z4':'Soglia',
+  'pwr_z5':'VO₂max',
+  'pwr3_z1':'Zona 1 (<VT1)',
+  'pwr3_z2':'Zona 2 (VT1-VT2)',
+  'pwr3_z3':'Zona 3 (>VT2)',
+  'hr_z1':'Z1 Facile',
+  'hr_z2':'Z2 Moderato',
+  'hr_z3':'Z3 Aerobico',
+  'hr_z4':'Z4 Soglia',
+  'hr_z5':'Z5 Max',
+  'hrd_z1':'Recupero',
+  'hrd_z2':'Aerobico (resist.)',
+  'hrd_z3':'Aerobico (potenza)',
+  'hrd_z4':'Soglia',
+  'hrd_z5':'Anaerobico',
+  'run_z1':'Resistenza',
+  'run_z2':'Soglia aero.',
+  'run_z3':'Soglia',
+  'run_z4':'Velocità',
+  'run_z5':'Sprint',
+  'btn_roadbook':'📄 Road Book PDF'
   },
   nl:{
   btn_gpx:'⊕ GPX',no_file:'— GEEN BESTAND GELADEN —',
@@ -4284,7 +4517,32 @@ const I18N={
   'climb_col_start':'Start',
   'climb_col_dplus':'D+',
   'climb_col_dist':'Afst.',
-  'climb_col_grade':'Gem. helling'
+  'climb_col_grade':'Gem. helling',
+  'climb_col_km_start':'Start km','climb_col_km_end':'Eind km','climb_col_alt_start':'Start hoogte','climb_col_alt_end':'Eind hoogte','chart_climb_grade':'STIJGING PER 100m','climb_legend_title':'LEGENDA','climb_legend_0':'0 tot 2,9%','climb_legend_3':'3 tot 5,9%','climb_legend_6':'6 tot 8,9%','climb_legend_9':'Vanaf 9%','climb_pct_label':'Gem. % per km','climb_ascent_label':'BEKLIMMING','climb_start_word':'Start','climb_at_word':' bij ','tab_profile':'Routeprofiel','tab_physio':'Fysiologische Resultaten','tab_nutrition':'Voeding — Hydratatie','zoom_scale':'Schaal','zoom_window':'Venster',
+  'pwr_z1':'Herstel',
+  'pwr_z2':'Duurvermogen',
+  'pwr_z3':'Tempo',
+  'pwr_z4':'Drempel',
+  'pwr_z5':'VO₂max',
+  'pwr3_z1':'Zone 1 (<VT1)',
+  'pwr3_z2':'Zone 2 (VT1-VT2)',
+  'pwr3_z3':'Zone 3 (>VT2)',
+  'hr_z1':'Z1 Licht',
+  'hr_z2':'Z2 Matig',
+  'hr_z3':'Z3 Aeroob',
+  'hr_z4':'Z4 Drempel',
+  'hr_z5':'Z5 Max',
+  'hrd_z1':'Herstel',
+  'hrd_z2':'Aeroob (duurzaamheid)',
+  'hrd_z3':'Aeroob (kracht)',
+  'hrd_z4':'Drempel',
+  'hrd_z5':'Anaeroob',
+  'run_z1':'Duurvermogen',
+  'run_z2':'Aeroob drempel',
+  'run_z3':'Drempel',
+  'run_z4':'Snelheid',
+  'run_z5':'Sprint',
+  'btn_roadbook':'📄 Road Book PDF'
   }
 };
 
@@ -4335,6 +4593,10 @@ function applyTranslations(){
  if(dt)dt.textContent=t('lbl_drag');
  // Re-render grade legend
  if(segCalcCache)drawElevationChart(segCalcCache);
+ // Re-render components whose text depends on t()
+ if(typeof renderZones==='function') renderZones();
+ if(window._lastClimbs && typeof renderClimbList==='function') renderClimbList(window._lastClimbs);
+ if(window._lastClimbs && typeof drawClimbGradeCharts==='function') drawClimbGradeCharts(window._lastClimbs);
  applyWelcomeTranslations();
  applyHelpModalTranslations();
 }
@@ -4380,14 +4642,22 @@ function collectSettings(){
  s._swFcAuto  = document.getElementById('sw-fc-auto')       ? document.getElementById('sw-fc-auto').classList.contains('on')       : false;
  s._swFtpAuto = document.getElementById('sw-ftp-auto')      ? document.getElementById('sw-ftp-auto').classList.contains('on')      : false;
  s._swThresh  = document.getElementById('sw-threshold-auto')? document.getElementById('sw-threshold-auto').classList.contains('on'): true;
- s._sport     = currentSport;
- s._paceMode  = paceMode;
- s._hrModel = hrModel;
- s._pwrModel = pwrModel;
- s._zoneCount = zoneCount;
+ s._sport        = currentSport;
+ s._paceMode     = paceMode;
+ s._hrModel      = hrModel;
+ s._pwrModel     = pwrModel;
+ s._zoneCount    = zoneCount;
  s._selectedZone = selectedZone;
- s._optMode = optMode;
- s._lang = currentLang;
+ s._optMode      = optMode;
+ s._lang         = currentLang;
+ // ── Champs ajoutés ──
+ s._swTheme  = document.getElementById('sw-theme')  ? document.getElementById('sw-theme').classList.contains('on')  : false;
+ s._swMap    = document.getElementById('sw-map')    ? document.getElementById('sw-map').classList.contains('on')    : false;
+ s._activeTab  = (typeof activeTab  !== 'undefined') ? activeTab  : 'profile';
+ const _zoomScaleEl  = document.getElementById('zoom-scale');
+ const _zoomWindowEl = document.getElementById('zoom-window');
+ s._zoomScale  = _zoomScaleEl  ? _zoomScaleEl.value  : null;
+ s._zoomWindow = _zoomWindowEl ? _zoomWindowEl.value : null;
  return s;
 }
 
@@ -4522,6 +4792,39 @@ function applySettings(s){
    if(_mP)_mP.style.display=s._swThresh?'none':'';
   }
  }
+ // ── Restauration theme clair/sombre ──
+ if(s._swTheme !== undefined){
+  const _swTh = document.getElementById('sw-theme');
+  if(_swTh){
+   lightTheme = !!s._swTheme;
+   if(lightTheme) _swTh.classList.add('on'); else _swTh.classList.remove('on');
+   document.body.classList.toggle('light', lightTheme);
+  }
+ }
+ // ── Restauration toggle carte ──
+ if(s._swMap !== undefined){
+  const _swM = document.getElementById('sw-map');
+  if(_swM){
+   if(s._swMap) _swM.classList.add('on'); else _swM.classList.remove('on');
+   const _mapC = document.getElementById('map-chart-container');
+   if(_mapC) _mapC.style.display = s._swMap ? '' : 'none';
+  }
+ }
+ // ── Restauration onglet actif ──
+ if(s._activeTab && typeof switchTab === 'function'){
+  switchTab(s._activeTab);
+ }
+ // ── Restauration curseurs zoom ──
+ if(s._zoomScale !== null && s._zoomScale !== undefined){
+  const _zs = document.getElementById('zoom-scale');
+  if(_zs){ _zs.value = s._zoomScale; }
+ }
+ if(s._zoomWindow !== null && s._zoomWindow !== undefined){
+  const _zw = document.getElementById('zoom-window');
+  if(_zw){ _zw.value = s._zoomWindow; }
+ }
+ // Appliquer le zoom apres restauration (seulement si GPX chargee)
+ if(gpxData && typeof applyNewZoom === 'function') applyNewZoom();
  updateFCauto();
  updateFTPauto();
  updatePauseTotal();
@@ -4846,11 +5149,11 @@ function getRunningZoneDefs(){
   // sec/km → min/km string helper
   const fmt=s=>`${Math.floor(s/60)}'${(Math.round(s%60)).toString().padStart(2,'0')}"`;
   return [
-    {z:1,name:'Endurance',   color:'#3b82f6', paceRange:[T*1.29, T*1.14], hr:[0.65*hrMax, 0.78*hrMax]},
-    {z:2,name:'Seuil aéro.', color:'#4ae870', paceRange:[T*1.13, T*1.05], hr:[0.78*hrMax, 0.87*hrMax]},
-    {z:3,name:'Seuil',       color:'#ffd700', paceRange:[T*1.04, T*0.94], hr:[0.87*hrMax, 0.93*hrMax]},
-    {z:4,name:'Vitesse',     color:'#ff8c00', paceRange:[T*0.93, T*0.84], hr:[0.93*hrMax, 0.98*hrMax]},
-    {z:5,name:'Sprint',      color:'#ff2040', paceRange:[0,       T*0.83], hr:[0.98*hrMax, hrMax]},
+    {z:1,name:t('run_z1'), color:'#3b82f6', paceRange:[T*1.29, T*1.14], hr:[0.65*hrMax, 0.78*hrMax]},
+    {z:2,name:t('run_z2'), color:'#4ae870', paceRange:[T*1.13, T*1.05], hr:[0.78*hrMax, 0.87*hrMax]},
+    {z:3,name:t('run_z3'), color:'#ffd700', paceRange:[T*1.04, T*0.94], hr:[0.87*hrMax, 0.93*hrMax]},
+    {z:4,name:t('run_z4'), color:'#ff8c00', paceRange:[T*0.93, T*0.84], hr:[0.93*hrMax, 0.98*hrMax]},
+    {z:5,name:t('run_z5'), color:'#ff2040', paceRange:[0,       T*0.83], hr:[0.98*hrMax, hrMax]},
   ];
 }
 
@@ -6018,75 +6321,107 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePhysioPopup(
 
 
 // ══════════════════════════════════════════════════
-//  ASCENSION DETECTION
-//  - Accumulate gain phase by phase
-//  - Ascension validated when followed by descent >= 50% of gain
-//  - If descent < 50%: current gain continues into next uphill
+//  ASCENSION DETECTION — Algorithme robuste anti-bruit GPS
+//
+//  Principe :
+//   1. Lissage de l'altitude par moyenne glissante (fenêtre ±SMOOTH_WIN segments)
+//   2. Calcul du delta lissé par segment (chaque segment ≈ 100m)
+//   3. Détection de montée quand delta_lissé > FLAT_THRESH
+//   4. Tolérance aux petites descentes dans une montée (DESCENT_TOLERANCE_PCT)
+//   5. Fin de montée quand la descente cumulée dépasse la tolérance
+//   6. Filtrage post-calcul : retenir seulement si D+ ≥ seuilUtilisateur
 // ══════════════════════════════════════════════════
 function detectAscensions(segments, thresholdM) {
-  const climbs = [];
-  let inAscension = false;
-  let gainAcc = 0;       // accumulated gain of current ascension
-  let lossAcc = 0;       // accumulated loss since last uphill peak
-  let climbDist = 0;     // distance of current ascension
-  let climbGrades = [];  // grades for avg calculation
-  let climbStartDist = 0;
-  let peakGain = 0;      // max gain reached in current ascension
+  if (!segments || !segments.length) return [];
 
-  segments.forEach((seg, i) => {
-    const gain = seg.segGain || 0;
-    const loss = seg.segLoss || Math.max(0, -(seg.dElev || 0));
-
-    if (gain > 0) {
-      // Uphill segment
-      if (!inAscension) {
-        inAscension = true;
-        gainAcc = 0;
-        lossAcc = 0;
-        climbDist = 0;
-        climbGrades = [];
-        climbStartDist = seg.distKm || 0;
-      }
-      gainAcc += gain;
-      climbDist += seg.len_km || 0;
-      if (seg.grade > 0) climbGrades.push(seg.grade);
-      peakGain = Math.max(peakGain, gainAcc);
-      lossAcc = 0; // reset pending loss
-    } else if (inAscension && loss > 0) {
-      lossAcc += loss;
-      climbDist += seg.len_km || 0;
-      // Check if descent >= 50% of accumulated gain → ascension ends
-      if (lossAcc >= gainAcc * 0.5) {
-        if (gainAcc >= thresholdM) {
-          const avgGrade = climbGrades.length
-            ? climbGrades.reduce((a,v)=>a+v,0) / climbGrades.length
-            : 0;
-          climbs.push({
-            dPlus: Math.round(gainAcc),
-            dist: parseFloat(climbDist.toFixed(2)),
-            avgGrade: parseFloat(avgGrade.toFixed(1)),
-            startDist: parseFloat(climbStartDist.toFixed(1))
-          });
-        }
-        inAscension = false;
-        gainAcc = 0; lossAcc = 0; climbDist = 0; climbGrades = []; peakGain = 0;
-      }
-    } else if (!inAscension) {
-      // flat — ignore
-    }
+  // ─── 1. Construire le profil altimétrique lissé ───
+  const SMOOTH_WIN = 8; // ±8 segments = ±800m de lissage de chaque côté
+  const rawEle = [segments[0].eleStart, ...segments.map(s => s.eleEnd)];
+  const n = rawEle.length;
+  const smoothed = rawEle.map((_, i) => {
+    const lo = Math.max(0, i - SMOOTH_WIN), hi = Math.min(n - 1, i + SMOOTH_WIN);
+    let sum = 0;
+    for (let j = lo; j <= hi; j++) sum += rawEle[j];
+    return sum / (hi - lo + 1);
   });
 
-  // Finalize last ascension if still open
-  if (inAscension && gainAcc >= thresholdM) {
-    const avgGrade = climbGrades.length
-      ? climbGrades.reduce((a,v)=>a+v,0) / climbGrades.length : 0;
-    climbs.push({
-      dPlus: Math.round(gainAcc),
-      dist: parseFloat(climbDist.toFixed(2)),
-      avgGrade: parseFloat(avgGrade.toFixed(1)),
-      startDist: parseFloat(climbStartDist.toFixed(1))
-    });
+  // Delta lissé par segment
+  const smoothDelta = segments.map((_, i) => smoothed[i + 1] - smoothed[i]);
+
+  // ─── 2. Paramètres de détection ───
+  const FLAT_THRESH = 0.3;              // < 0.3m par segment = plat ignoré
+  const DESCENT_TOL_PCT = 0.20;         // tolérer jusqu'à 20% du D+ accumulé en descente
+  const DESCENT_TOL_MIN = 5;            // minimum absolu de tolérance = 5m
+
+  const climbs = [];
+  let inClimb = false;
+  let startIdx = 0;
+  let accGain = 0;    // D+ lissé accumulé
+  let peakGain = 0;   // max D+ atteint dans cette montée
+  let accLoss = 0;    // descente cumulée depuis le dernier pic
+  let realDplus = 0;  // D+ réel (segGain) pour affichage
+
+  const endClimb = (endIdx) => {
+    if (!inClimb) return;
+    inClimb = false;
+    if (realDplus >= thresholdM && endIdx >= startIdx) {
+      const seg0 = segments[startIdx];
+      const segN = segments[Math.min(endIdx, segments.length - 1)];
+      const startKm = parseFloat(seg0.dist_km.toFixed(2));
+      const endKm   = parseFloat((segN.dist_km + segN.len_km).toFixed(2));
+      const altS    = Math.round(smoothed[startIdx]);
+      const altE    = Math.round(smoothed[Math.min(endIdx + 1, n - 1)]);
+      const dist    = Math.max(0.01, endKm - startKm);
+      const avgGrade = (realDplus / (dist * 1000)) * 100;
+      climbs.push({
+        dPlus:    Math.round(realDplus),
+        dist:     parseFloat(dist.toFixed(2)),
+        avgGrade: parseFloat(avgGrade.toFixed(1)),
+        startDist: startKm,
+        endDist:   endKm,
+        altStart:  altS,
+        altEnd:    altE,
+        startIdx,
+        endIdx:    Math.min(endIdx, segments.length - 1)
+      });
+    }
+    accGain = 0; peakGain = 0; accLoss = 0; realDplus = 0;
+  };
+
+  for (let i = 0; i < segments.length; i++) {
+    const delta = smoothDelta[i];
+
+    if (delta > FLAT_THRESH) {
+      // ── Montée ──
+      if (!inClimb) {
+        inClimb = true;
+        startIdx = i;
+        accGain = 0; peakGain = 0; accLoss = 0; realDplus = 0;
+      }
+      accGain += delta;
+      peakGain = Math.max(peakGain, accGain);
+      accLoss = 0;                           // on repart en montée → réinitialise la tolérance
+      realDplus += segments[i].segGain || 0;
+
+    } else if (delta < -FLAT_THRESH && inClimb) {
+      // ── Descente dans une montée ──
+      accLoss += Math.abs(delta);
+      realDplus += segments[i].segGain || 0;
+
+      const tolerance = Math.max(DESCENT_TOL_MIN, peakGain * DESCENT_TOL_PCT);
+      if (accLoss > tolerance) {
+        // Descente trop longue → fin de montée (on remonte à l'indice avant la descente)
+        endClimb(i - 1);
+      }
+
+    } else if (inClimb) {
+      // ── Plat dans une montée (toléré) ──
+      realDplus += segments[i].segGain || 0;
+    }
+    // Plat hors montée : rien
   }
+
+  if (inClimb) endClimb(segments.length - 1);
 
   return climbs;
 }
@@ -6097,6 +6432,8 @@ function renderClimbList(climbs) {
   if (!container) return;
   if (!climbs || climbs.length === 0) {
     container.style.display = 'none';
+    const cgc = document.getElementById('climb-grade-charts-container');
+    if (cgc) cgc.style.display = 'none';
     return;
   }
   container.style.display = '';
@@ -6106,28 +6443,410 @@ function renderClimbList(climbs) {
   const body = document.getElementById('climb-list-body');
   if (!body) return;
 
-  let html = '<table style="width:100%;border-collapse:collapse;font-size:10px">';
-  html += '<thead><tr style="color:var(--accent);font-size:9px;letter-spacing:1px;text-transform:uppercase">';
-  html += '<th style="text-align:left;padding:3px 6px">#</th>';
-  html += '<th style="padding:3px 6px">' + t('climb_col_start')  + '</th>';
-  html += '<th style="padding:3px 6px">' + t('climb_col_dplus')  + '</th>';
-  html += '<th style="padding:3px 6px">' + t('climb_col_dist')   + '</th>';
-  html += '<th style="padding:3px 6px">' + t('climb_col_grade')  + '</th>';
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:10px;font-family:JetBrains Mono,monospace">';
+  html += '<thead><tr style="color:var(--accent);font-size:9px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border2)">';
+  html += '<th style="text-align:center;padding:4px 6px">#</th>';
+  html += '<th style="padding:4px 6px;text-align:center">' + t('climb_col_km_start') + '</th>';
+  html += '<th style="padding:4px 6px;text-align:center">' + t('climb_col_km_end')   + '</th>';
+  html += '<th style="padding:4px 6px;text-align:center">' + t('climb_col_alt_start')+ '</th>';
+  html += '<th style="padding:4px 6px;text-align:center">' + t('climb_col_alt_end')  + '</th>';
+  html += '<th style="padding:4px 6px;text-align:center">' + t('climb_col_dplus')    + '</th>';
+  html += '<th style="padding:4px 6px;text-align:center">' + t('climb_col_dist')     + '</th>';
+  html += '<th style="padding:4px 6px;text-align:center">' + t('climb_col_grade')    + '</th>';
   html += '</tr></thead><tbody>';
 
   climbs.forEach((c, i) => {
     const rowBg = i % 2 === 0 ? 'background:var(--panel2)' : '';
-    html += '<tr style="' + rowBg + '">';
-    html += '<td style="padding:3px 6px;color:var(--accent);font-weight:700">' + (i+1) + '</td>';
-    html += '<td style="padding:3px 6px;text-align:center;color:var(--text2)">' + c.startDist + ' km</td>';
-    html += '<td style="padding:3px 6px;text-align:center;font-weight:700;color:var(--accent2)">+' + c.dPlus + ' m</td>';
-    html += '<td style="padding:3px 6px;text-align:center">' + c.dist + ' km</td>';
-    html += '<td style="padding:3px 6px;text-align:center">' + c.avgGrade + ' %</td>';
+    html += '<tr style="' + rowBg + ';border-top:1px solid var(--border2)">';
+    html += '<td style="padding:4px 6px;text-align:center;color:var(--accent);font-weight:700">' + (i+1) + '</td>';
+    html += '<td style="padding:4px 6px;text-align:center;color:var(--text2)">' + (c.startDist||'—') + ' km</td>';
+    html += '<td style="padding:4px 6px;text-align:center;color:var(--text2)">' + (c.endDist||'—') + ' km</td>';
+    html += '<td style="padding:4px 6px;text-align:center;color:var(--accent3)">' + (c.altStart||'—') + ' m</td>';
+    html += '<td style="padding:4px 6px;text-align:center;color:var(--accent3)">' + (c.altEnd||'—') + ' m</td>';
+    html += '<td style="padding:4px 6px;text-align:center;font-weight:700;color:var(--accent2)">+' + c.dPlus + ' m</td>';
+    html += '<td style="padding:4px 6px;text-align:center">' + c.dist + ' km</td>';
+    html += '<td style="padding:4px 6px;text-align:center">' + c.avgGrade + ' %</td>';
     html += '</tr>';
   });
   html += '</tbody></table>';
   body.innerHTML = html;
 }
+
+// ══════════════════════════════════════════════════
+//  TDF-STYLE CLIMB PROFILE GRAPHIC (per ascension)
+//  Visual reference: official Tour de France roadbook
+//  climb profiles (yellow background, colored grade
+//  ribbon, per-km %/km black bar, summit header+badge).
+// ══════════════════════════════════════════════════
+
+// 4-band legend matching the official graphic (sampled from reference)
+const TDF_CLIMB4 = [
+  { max: 2.9, color: '#7FBB25' },  // green
+  { max: 5.9, color: '#005099' },  // blue
+  { max: 8.9, color: '#E2010A' },  // red
+  { max: 999, color: '#15140A' }   // black
+];
+function gradeColorClimb4(g) {
+  for (const b of TDF_CLIMB4) if (g <= b.max) return b.color;
+  return '#15140A';
+}
+// Category badge colors (à la carte routière officielle)
+function climbCategory(dPlus) {
+  if (dPlus >= 1500) return 'HC';
+  if (dPlus >= 1000) return '1';
+  if (dPlus >= 600)  return '2';
+  if (dPlus >= 300)  return '3';
+  return '4';
+}
+function climbCategoryColor(cat) {
+  return cat === 'HC' || cat === '1' ? '#E2010A'
+       : cat === '2' ? '#005099'
+       : cat === '3' ? '#7FBB25'
+       : '#FFC414';
+}
+// "2 000" style spacing for altitudes ≥ 1000
+function fmtAlt(a) {
+  a = Math.round(a);
+  return a >= 1000 ? (Math.floor(a / 1000) + ' ' + String(a % 1000).padStart(3, '0')) : String(a);
+}
+// Pick which km-boundaries get an intermediate label (start + up to 3 notable
+// false-flats/saddles where the average grade dips below 3% mid-climb)
+function detectClimbLabelPoints(colGrade, N) {
+  const pts = [0];
+  if (N <= 3) return pts;
+  const runs = [];
+  let i = 0;
+  while (i < N) {
+    if (colGrade[i] < 3) {
+      let j = i;
+      while (j < N && colGrade[j] < 3) j++;
+      runs.push({ end: j, len: j - i });
+      i = j;
+    } else i++;
+  }
+  runs.filter(r => r.end > 0 && r.end < N)
+    .sort((a, b) => b.len - a.len)
+    .slice(0, 3)
+    .map(r => r.end)
+    .sort((a, b) => a - b)
+    .forEach(k => { if (!pts.includes(k)) pts.push(k); });
+  return pts;
+}
+
+// ── Build & append one TDF-style card per detected climb ──
+function drawClimbGradeCharts(climbs) {
+  const wrapper = document.getElementById('climb-grade-charts-container');
+  if (!wrapper || !climbs || !climbs.length || !gpxData) {
+    if (wrapper) wrapper.style.display = 'none';
+    return;
+  }
+  wrapper.style.display = 'flex';
+  wrapper.innerHTML = '';
+
+  climbs.forEach((climb, ci) => {
+    const card = document.createElement('div');
+    card.className = 'chart-container';
+
+    const hdrDiv = document.createElement('div');
+    hdrDiv.className = 'chart-header';
+    hdrDiv.textContent = t('climb_ascent_label') + ' #' + (ci + 1)
+      + '  (' + climb.startDist + ' → ' + climb.endDist + ' km)';
+    card.appendChild(hdrDiv);
+
+    const cv = document.createElement('canvas');
+    cv.id = 'climb-grade-cv-' + ci;
+    cv.style.display = 'block';
+    card.appendChild(cv);
+    wrapper.appendChild(card);
+
+    const segs = gpxData.segments.filter(s =>
+      s.dist_km >= climb.startDist - 0.05 &&
+      s.dist_km + s.len_km <= climb.endDist + 0.05
+    );
+    if (!segs.length) return;
+
+    _drawClimbGradeChart(cv, segs, climb, ci);
+  });
+}
+
+function _drawClimbGradeChart(cv, segs, climb, idx) {
+  const container = cv.parentElement;
+  const W = Math.max(320, container.clientWidth - 16);
+  if (!segs.length) return;
+
+  // ── Layout ──
+  const PAD = { l: 14, r: 46, t: 96, b: 34 };
+  const H = 300;
+  const dpr = Math.ceil(window.devicePixelRatio || 1);
+  cv.style.width = W + 'px';
+  cv.style.height = H + 'px';
+  cv.width = W * dpr;
+  cv.height = H * dpr;
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+
+  const chartW = W - PAD.l - PAD.r;
+  const chartTop = PAD.t;
+  const chartH = H - PAD.t - PAD.b;
+  const baseY = chartTop + chartH;
+
+  const cs = getComputedStyle(document.documentElement);
+  const textColor = cs.getPropertyValue('--text').trim() || '#e2e8f0';
+  const text2 = cs.getPropertyValue('--text2').trim() || '#64748b';
+
+  // ── Fine-grained elevation polyline (relative km from climb start) ──
+  const finePts = [{ x: 0, ele: segs[0].eleStart }];
+  segs.forEach(s => finePts.push({ x: (s.dist_km + s.len_km) - climb.startDist, ele: s.eleEnd }));
+  const rawEle = finePts.map(p => p.ele);
+  const smEle = rawEle.map((_, i) => {
+    const lo = Math.max(0, i - 2), hi = Math.min(rawEle.length - 1, i + 2);
+    let sum = 0; for (let j = lo; j <= hi; j++) sum += rawEle[j];
+    return sum / (hi - lo + 1);
+  });
+  finePts.forEach((p, i) => p.ele = smEle[i]);
+
+  function eleAt(distKm) {
+    distKm = Math.max(0, Math.min(climb.dist, distKm));
+    for (let i = 0; i < finePts.length - 1; i++) {
+      if (distKm >= finePts[i].x && distKm <= finePts[i + 1].x) {
+        const span = Math.max(1e-6, finePts[i + 1].x - finePts[i].x);
+        const f = (distKm - finePts[i].x) / span;
+        return finePts[i].ele + f * (finePts[i + 1].ele - finePts[i].ele);
+      }
+    }
+    return finePts[finePts.length - 1].ele;
+  }
+
+  // ── 1km columns (equal width, last one prorated if dist isn't a whole km) ──
+  const N = Math.max(1, Math.round(climb.dist));
+  const colDist = climb.dist / N;
+  const boundaries = [];
+  for (let k = 0; k <= N; k++) {
+    const d = k * colDist;
+    boundaries.push({ dist: d, ele: eleAt(d) });
+  }
+  const colGrade = [];
+  for (let k = 0; k < N; k++) {
+    const dEle = boundaries[k + 1].ele - boundaries[k].ele;
+    const dM = colDist * 1000;
+    let g = dM > 0 ? (dEle / dM) * 100 : 0;
+    colGrade.push(Math.round(g * 2) / 2);
+  }
+
+  const altMin = Math.min(...boundaries.map(b => b.ele));
+  const altMax = Math.max(...boundaries.map(b => b.ele));
+  const axisStep = (altMax - altMin) <= 300 ? 50 : (altMax - altMin) <= 800 ? 100 : 200;
+  const axisMin = Math.floor(altMin / axisStep) * axisStep;
+  const axisMax = Math.ceil(altMax / axisStep) * axisStep;
+  const altRange = Math.max(1, axisMax - axisMin);
+
+  const chartX = d => PAD.l + (d / climb.dist) * chartW;
+  const chartY = e => chartTop + chartH - ((e - axisMin) / altRange) * chartH;
+
+  // ── Yellow background (the "mountain") ──
+  const yGrad = ctx.createLinearGradient(0, chartTop, 0, baseY);
+  yGrad.addColorStop(0, '#ffe680');
+  yGrad.addColorStop(1, '#ffc414');
+  ctx.fillStyle = yGrad;
+  ctx.fillRect(PAD.l, chartTop, chartW, chartH);
+
+  // ── Horizontal grid + right-side altitude axis ──
+  ctx.font = '8px JetBrains Mono, monospace';
+  ctx.textAlign = 'left';
+  for (let a = axisMin; a <= axisMax; a += axisStep) {
+    const y = chartY(a);
+    ctx.beginPath();
+    ctx.setLineDash([3, 3]);
+    ctx.strokeStyle = 'rgba(120,90,10,0.35)';
+    ctx.lineWidth = 0.6;
+    ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = text2;
+    ctx.fillText(fmtAlt(a) + ' m', W - PAD.r + 5, y + 3);
+  }
+
+  // ── Vertical km gridlines (dashed, like the road's km markers) ──
+  for (let k = 1; k < N; k++) {
+    const x = chartX(boundaries[k].dist);
+    ctx.beginPath();
+    ctx.setLineDash([2, 3]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 0.7;
+    ctx.moveTo(x, chartY(boundaries[k].ele));
+    ctx.lineTo(x, baseY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // ── Colored ribbon (the climb itself), bent at each km boundary ──
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (let k = 0; k < N; k++) {
+    ctx.beginPath();
+    ctx.strokeStyle = gradeColorClimb4(colGrade[k]);
+    ctx.lineWidth = 9;
+    ctx.moveTo(chartX(boundaries[k].dist), chartY(boundaries[k].ele));
+    ctx.lineTo(chartX(boundaries[k + 1].dist), chartY(boundaries[k + 1].ele));
+    ctx.stroke();
+  }
+  // Dashed white "road centerline" on top
+  ctx.beginPath();
+  ctx.setLineDash([6, 5]);
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+  ctx.lineWidth = 1.4;
+  boundaries.forEach((b, i) => {
+    const x = chartX(b.dist), y = chartY(b.ele);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── Bottom bar: row 1 = avg grade %, row 2 = km number ──
+  ctx.fillStyle = '#15140A';
+  ctx.fillRect(PAD.l, baseY, chartW, PAD.b);
+  const rowH = PAD.b / 2;
+  const showLabels = (chartW / N) >= 13;
+  ctx.textAlign = 'center';
+  for (let k = 0; k < N; k++) {
+    if (k > 0) {
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = 0.6;
+      ctx.moveTo(chartX(boundaries[k].dist), baseY);
+      ctx.lineTo(chartX(boundaries[k].dist), baseY + PAD.b);
+      ctx.stroke();
+    }
+    if (showLabels) {
+      const xc = (chartX(boundaries[k].dist) + chartX(boundaries[k + 1].dist)) / 2;
+      ctx.font = '7.5px JetBrains Mono, monospace';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(colGrade[k] % 1 === 0 ? colGrade[k].toFixed(0) : colGrade[k].toFixed(1), xc, baseY + rowH - 3);
+      ctx.font = 'bold 8px JetBrains Mono, monospace';
+      ctx.fillStyle = '#ffd24a';
+      ctx.fillText(String(k + 1), xc, baseY + rowH + rowH - 3);
+    }
+  }
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 0.6;
+  ctx.moveTo(PAD.l, baseY + rowH); ctx.lineTo(W - PAD.r, baseY + rowH);
+  ctx.stroke();
+
+  ctx.textAlign = 'right';
+  ctx.font = 'italic 7.5px Inter, sans-serif';
+  ctx.fillStyle = text2;
+  ctx.fillText(t('climb_pct_label'), W - PAD.r, baseY - 4);
+
+  // ── Legend (top-left) ──
+  const legendItems = [
+    [t('climb_legend_0'), TDF_CLIMB4[0].color],
+    [t('climb_legend_3'), TDF_CLIMB4[1].color],
+    [t('climb_legend_6'), TDF_CLIMB4[2].color],
+    [t('climb_legend_9'), TDF_CLIMB4[3].color]
+  ];
+  let lx = PAD.l + 2;
+  ctx.textAlign = 'left';
+  ctx.font = '7px Inter, sans-serif';
+  legendItems.forEach(([label, color]) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(lx, 5, 8, 8);
+    ctx.fillStyle = text2;
+    ctx.fillText(label, lx + 11, 12);
+    lx += 11 + ctx.measureText(label).width + 10;
+  });
+
+  // ── Summit header (top-right) + category badge ──
+  const cat = climbCategory(climb.dPlus);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = textColor;
+  ctx.font = 'bold 12px Inter, sans-serif';
+  ctx.fillText(t('climb_ascent_label') + ' #' + (idx + 1) + '  –  ' + fmtAlt(climb.altEnd) + ' m', W - 26, 38);
+  ctx.font = '10px Inter, sans-serif';
+  ctx.fillStyle = text2;
+  ctx.fillText('km ' + climb.endDist.toFixed(1) + '  (' + climb.dist.toFixed(1) + ' km' + t('climb_at_word') + climb.avgGrade.toFixed(1) + '%)', W - 26, 52);
+
+  const badgeX = W - 14, badgeY = 16, badgeColor = climbCategoryColor(cat);
+  ctx.beginPath();
+  ctx.fillStyle = badgeColor;
+  ctx.arc(badgeX, badgeY, 11, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = cat === '4' ? '#15140A' : '#fff';
+  ctx.font = 'bold 9px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(cat, badgeX, badgeY + 3);
+  const summitX = chartX(climb.dist), summitY = chartY(boundaries[N].ele);
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(140,140,140,0.6)';
+  ctx.lineWidth = 0.7;
+  ctx.moveTo(badgeX, badgeY + 11);
+  ctx.lineTo(summitX, summitY);
+  ctx.stroke();
+
+  // ── Intermediate / start labels ──
+  const labelPts = detectClimbLabelPoints(colGrade, N);
+  let horizCount = 0;
+  labelPts.forEach(k => {
+    const x = chartX(boundaries[k].dist);
+    const y = chartY(boundaries[k].ele);
+    const headroom = y - chartTop;
+    const absKm = (climb.startDist + boundaries[k].dist).toFixed(1);
+    const txt = fmtAlt(boundaries[k].ele) + ' m  ' + (k === 0 ? t('climb_start_word') + ' – ' : '') + 'km ' + absKm;
+    if (headroom > 55) {
+      // Rotated label drawn upward inside the yellow zone, right of the gridline
+      ctx.save();
+      ctx.translate(x + 3, y - 6);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 8px Inter, sans-serif';
+      ctx.fillStyle = '#1a1305';
+      ctx.fillText(txt, 0, 0);
+      ctx.restore();
+    } else {
+      // Horizontal label, staggered upward in the reserved top zone, with leader line
+      const ly = (chartTop - 10) - horizCount * 13;
+      horizCount++;
+      ctx.beginPath();
+      ctx.setLineDash([2, 2]);
+      ctx.strokeStyle = 'rgba(140,140,140,0.7)';
+      ctx.lineWidth = 0.7;
+      ctx.moveTo(x, ly + 3);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 8.5px Inter, sans-serif';
+      ctx.fillStyle = textColor;
+      ctx.fillText(txt, x, ly);
+    }
+  });
+}
+
+
+// ══════════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════════
+let activeTab = 'profile';
+
+function switchTab(tabName) {
+  activeTab = tabName;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tabName);
+  });
+  document.querySelectorAll('.tab-content').forEach(p => {
+    p.style.display = 'none';
+  });
+  const panel = document.getElementById('tab-' + tabName);
+  if (panel) panel.style.display = '';
+  if (segCalcCache) requestAnimationFrame(() => drawAllCharts(segCalcCache));
+}
+
+(function(){
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+})();
 
 // INIT
 // ══════════════════════════════════════════════════
