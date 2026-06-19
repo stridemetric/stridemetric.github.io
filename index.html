@@ -243,7 +243,7 @@ canvas{display:block;image-rendering:crisp-edges}
 .timing-table{display:flex;min-width:max-content}
 .timing-cell{min-width:44px;text-align:center;border-right:1px solid var(--border2);padding:3px 2px}
 .timing-cell:last-child{border-right:none}
-.tc-km{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--text2)}
+.tc-km{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--accent)}
 .tc-time{font-family:'Inter',sans-serif;font-weight:600;font-size:11px;color:var(--accent)}
 .tc-grade{font-size:7px;font-family:'JetBrains Mono',monospace;margin-top:1px}
 .tc-zone-bar{height:3px;margin-top:2px;border-radius:1px}
@@ -1049,9 +1049,9 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
 
   <!-- ── TAB NAVIGATION ── -->
   <div class="tab-nav" id="tab-nav">
-    <button class="tab-btn active" data-tab="profile" data-i18n="tab_profile">PROFIL DE SORTIE</button>
-    <button class="tab-btn" data-tab="physio" data-i18n="tab_physio">RÉSULTATS PHYSIOLOGIQUES</button>
-    <button class="tab-btn" data-tab="nutrition" data-i18n="tab_nutrition">NUTRITION - HYDRATATION</button>
+    <button class="tab-btn active" data-tab="profile" data-i18n="tab_profile">🗺️</button>
+    <button class="tab-btn" data-tab="physio" data-i18n="tab_physio">💓</button>
+    <button class="tab-btn" data-tab="nutrition" data-i18n="tab_nutrition">🍌</button>
   </div>
 
   <!-- ══ TAB 1: PROFIL DE SORTIE ══ -->
@@ -1077,10 +1077,6 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
     </div>
 
     <!-- VITESSE PAR ZONE -->
-    <div class="chart-container" id="speed-chart-container" style="display:none">
-      <div class="chart-header" data-i18n="chart_speed">VITESSE PAR ZONE ET KILOMÈTRE</div>
-      <canvas id="speed-canvas"></canvas>
-    </div>
 
     <!-- HORAIRE DE PASSAGE PAR KILOMÈTRE -->
     <div class="chart-container" id="timing-container" style="display:none">
@@ -1764,7 +1760,7 @@ function calcRoute(){
  // Init zoom if not done yet
  if(typeof initNewZoom==='function' && gpxData) initNewZoom(gpxData.totalDist);
  // Show climb-list and climb-grade containers
- ['elev-chart-container','timing-container','speed-chart-container'].forEach(id=>{
+ ['elev-chart-container','timing-container'].forEach(id=>{
    const el=document.getElementById(id);if(el)el.style.display='';
  });
  // map-toggle-bar
@@ -2056,7 +2052,7 @@ function drawAllCharts(segs){
  drawMapTrace(segs);
  drawElevationChart(segs);
  drawTimingStrip(segs);
- drawSpeedChart(segs);
+ if(document.getElementById('speed-chart-container')) drawSpeedChart(segs);
  drawHRDistChart(segs);
  drawPaceDistChart(segs);
  drawNutritionTable(segs);
@@ -2361,14 +2357,11 @@ function drawTimingStrip(segs){
  const gs=(avgGrade>=0?'+':'')+avgGrade.toFixed(1)+'%';
  const cell=document.createElement('div');cell.className='timing-cell';
  // Color bar AND text both use gradeColor — fully consistent
- cell.innerHTML=`<div class="tc-km">${km}km</div><div class="tc-time">${tod}</div><div class="tc-grade" style="color:${col}">${gs}</div>${c.feedHere?'<div class="tc-feed">🍌</div>':''}<div class="tc-zone-bar" style="background:${col}"></div>`;
+ cell.innerHTML=`<div class="tc-km">${km}km</div><div class="tc-time">${tod}</div>${c.feedHere?'<div class="tc-feed">🍌</div>':''}<div class="tc-zone-bar" style="background:${col}"></div>`;
  tbl.appendChild(cell);
  });
- // Legend: TDF gradient scale matching the grade colors
- const leg=document.getElementById('timing-legend');leg.innerHTML='';
- [{l:'Descente',c:'#40b8d8'},{l:'<3%',c:'#55cc55'},{l:'3–5%',c:'#88cc00'},
- {l:'5–7%',c:'#cccc00'},{l:'7–9%',c:'#ff6600'},{l:'9–12%',c:'#ff2200'},{l:'>12%',c:'#cc00cc'}]
- .forEach(({l,c})=>leg.innerHTML+=`<span style="display:inline-flex;align-items:center;gap:2px"><span style="display:inline-block;width:8px;height:8px;background:${c};border-radius:1px"></span><span style="color:var(--text2);font-size:9px">${l}</span></span>`);
+ // Legend removed
+ const leg=document.getElementById('timing-legend');if(leg)leg.style.display='none';
 }
 
 // ══════════════════════════════════════════════════
@@ -3408,9 +3401,9 @@ const I18N={
   'climb_ascent_label':'ASCENT',
   'climb_start_word':'Start',
   'climb_at_word':' at ',
-  'tab_profile':'Outing Profile',
-  'tab_physio':'Physiological Results',
-  'tab_nutrition':'Nutrition — Hydration',
+  'tab_profile':'🗺️',
+  'tab_physio':'💓',
+  'tab_nutrition':'🍌',
   'zoom_scale':'Scale',
   'zoom_window':'Window',
   'pwr_z1':'Recovery',
@@ -3640,9 +3633,9 @@ const I18N={
   'climb_ascent_label':'ASCENSION',
   'climb_start_word':'Départ',
   'climb_at_word':' à ',
-  'tab_profile':'Profil de sortie',
-  'tab_physio':'Résultats physiologiques',
-  'tab_nutrition':'Nutrition — Hydratation',
+  'tab_profile':'🗺️',
+  'tab_physio':'💓',
+  'tab_nutrition':'🍌',
   'zoom_scale':'Échelle',
   'zoom_window':'Fenêtre',
   'pwr_z1':'Récup.',
@@ -3872,9 +3865,9 @@ const I18N={
   'climb_ascent_label':'ANSTIEG',
   'climb_start_word':'Start',
   'climb_at_word':' bei ',
-  'tab_profile':'Streckenprofil',
-  'tab_physio':'Physiolog. Ergebnisse',
-  'tab_nutrition':'Ernährung — Hydration',
+  'tab_profile':'🗺️',
+  'tab_physio':'💓',
+  'tab_nutrition':'🍌',
   'zoom_scale':'Maßstab',
   'zoom_window':'Fenster',
   'pwr_z1':'Erholung',
@@ -4090,7 +4083,7 @@ const I18N={
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
   'climb_col_grade':'Pend. media',
-  'climb_col_km_start':'Km inicio','climb_col_km_end':'Km fin','climb_col_alt_start':'Alt. inicio','climb_col_alt_end':'Alt. fin','chart_climb_grade':'PENDIENTE — ASCENSO','climb_legend_title':'LEYENDA','climb_legend_0':'De 0 a 2,9%','climb_legend_3':'De 3 a 5,9%','climb_legend_6':'De 6 a 8,9%','climb_legend_9':'A partir de 9%','climb_pct_label':'% medio por km','climb_ascent_label':'ASCENSO','climb_start_word':'Inicio','climb_at_word':' a ','tab_profile':'Perfil de salida','tab_physio':'Resultados fisiológicos','tab_nutrition':'Nutrición — Hidratación','zoom_scale':'Escala','zoom_window':'Ventana',
+  'climb_col_km_start':'Km inicio','climb_col_km_end':'Km fin','climb_col_alt_start':'Alt. inicio','climb_col_alt_end':'Alt. fin','chart_climb_grade':'PENDIENTE — ASCENSO','climb_legend_title':'LEYENDA','climb_legend_0':'De 0 a 2,9%','climb_legend_3':'De 3 a 5,9%','climb_legend_6':'De 6 a 8,9%','climb_legend_9':'A partir de 9%','climb_pct_label':'% medio por km','climb_ascent_label':'ASCENSO','climb_start_word':'Inicio','climb_at_word':' a ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Escala','zoom_window':'Ventana',
   'pwr_z1':'Recuperación',
   'pwr_z2':'Resistencia',
   'pwr_z3':'Tempo',
@@ -4304,7 +4297,7 @@ const I18N={
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
   'climb_col_grade':'Pend. media',
-  'climb_col_km_start':'Km inizio','climb_col_km_end':'Km fine','climb_col_alt_start':'Alt. inizio','climb_col_alt_end':'Alt. fine','chart_climb_grade':'PENDENZA — SALITA','climb_legend_title':'LEGENDA','climb_legend_0':'Da 0 a 2,9%','climb_legend_3':'Da 3 a 5,9%','climb_legend_6':'Da 6 a 8,9%','climb_legend_9':'Dal 9%','climb_pct_label':'% media per km','climb_ascent_label':'SALITA','climb_start_word':'Partenza','climb_at_word':' a ','tab_profile':'Profilo uscita','tab_physio':'Risultati fisiologici','tab_nutrition':'Nutrizione — Idratazione','zoom_scale':'Scala','zoom_window':'Finestra',
+  'climb_col_km_start':'Km inizio','climb_col_km_end':'Km fine','climb_col_alt_start':'Alt. inizio','climb_col_alt_end':'Alt. fine','chart_climb_grade':'PENDENZA — SALITA','climb_legend_title':'LEGENDA','climb_legend_0':'Da 0 a 2,9%','climb_legend_3':'Da 3 a 5,9%','climb_legend_6':'Da 6 a 8,9%','climb_legend_9':'Dal 9%','climb_pct_label':'% media per km','climb_ascent_label':'SALITA','climb_start_word':'Partenza','climb_at_word':' a ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Scala','zoom_window':'Finestra',
   'pwr_z1':'Recupero',
   'pwr_z2':'Resistenza',
   'pwr_z3':'Tempo',
@@ -4518,7 +4511,7 @@ const I18N={
   'climb_col_dplus':'D+',
   'climb_col_dist':'Afst.',
   'climb_col_grade':'Gem. helling',
-  'climb_col_km_start':'Start km','climb_col_km_end':'Eind km','climb_col_alt_start':'Start hoogte','climb_col_alt_end':'Eind hoogte','chart_climb_grade':'STIJGING PER 100m','climb_legend_title':'LEGENDA','climb_legend_0':'0 tot 2,9%','climb_legend_3':'3 tot 5,9%','climb_legend_6':'6 tot 8,9%','climb_legend_9':'Vanaf 9%','climb_pct_label':'Gem. % per km','climb_ascent_label':'BEKLIMMING','climb_start_word':'Start','climb_at_word':' bij ','tab_profile':'Routeprofiel','tab_physio':'Fysiologische Resultaten','tab_nutrition':'Voeding — Hydratatie','zoom_scale':'Schaal','zoom_window':'Venster',
+  'climb_col_km_start':'Start km','climb_col_km_end':'Eind km','climb_col_alt_start':'Start hoogte','climb_col_alt_end':'Eind hoogte','chart_climb_grade':'STIJGING PER 100m','climb_legend_title':'LEGENDA','climb_legend_0':'0 tot 2,9%','climb_legend_3':'3 tot 5,9%','climb_legend_6':'6 tot 8,9%','climb_legend_9':'Vanaf 9%','climb_pct_label':'Gem. % per km','climb_ascent_label':'BEKLIMMING','climb_start_word':'Start','climb_at_word':' bij ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Schaal','zoom_window':'Venster',
   'pwr_z1':'Herstel',
   'pwr_z2':'Duurvermogen',
   'pwr_z3':'Tempo',
@@ -6364,25 +6357,35 @@ function detectAscensions(segments, thresholdM) {
   const endClimb = (endIdx) => {
     if (!inClimb) return;
     inClimb = false;
-    if (realDplus >= thresholdM && endIdx >= startIdx) {
-      const seg0 = segments[startIdx];
-      const segN = segments[Math.min(endIdx, segments.length - 1)];
-      const startKm = parseFloat(seg0.dist_km.toFixed(2));
-      const endKm   = parseFloat((segN.dist_km + segN.len_km).toFixed(2));
-      const altS    = Math.round(smoothed[startIdx]);
-      const altE    = Math.round(smoothed[Math.min(endIdx + 1, n - 1)]);
-      const dist    = Math.max(0.01, endKm - startKm);
-      const avgGrade = (realDplus / (dist * 1000)) * 100;
+
+    // ── Find the true summit: highest smoothed altitude between startIdx and endIdx ──
+    let peakSegIdx = startIdx;
+    let peakAlt = smoothed[startIdx + 1] ?? smoothed[startIdx];
+    for (let j = startIdx + 1; j <= Math.min(endIdx, segments.length - 1); j++) {
+      const alt = smoothed[Math.min(j + 1, n - 1)];
+      if (alt > peakAlt) { peakAlt = alt; peakSegIdx = j; }
+    }
+
+    const seg0   = segments[startIdx];
+    const segN   = segments[Math.min(peakSegIdx, segments.length - 1)];
+    const startKm = parseFloat(seg0.dist_km.toFixed(2));
+    const endKm   = parseFloat((segN.dist_km + segN.len_km).toFixed(2));
+    const altS    = Math.round(smoothed[startIdx]);
+    const altE    = Math.round(peakAlt);
+    const dPlus   = Math.max(0, altE - altS);   // net gain start → summit
+    const dist    = Math.max(0.01, endKm - startKm);
+
+    if (dPlus >= thresholdM && peakSegIdx >= startIdx) {
       climbs.push({
-        dPlus:    Math.round(realDplus),
-        dist:     parseFloat(dist.toFixed(2)),
-        avgGrade: parseFloat(avgGrade.toFixed(1)),
+        dPlus,
+        dist:      parseFloat(dist.toFixed(2)),
+        avgGrade:  parseFloat(((dPlus / (dist * 1000)) * 100).toFixed(1)),
         startDist: startKm,
         endDist:   endKm,
         altStart:  altS,
         altEnd:    altE,
         startIdx,
-        endIdx:    Math.min(endIdx, segments.length - 1)
+        endIdx:    Math.min(peakSegIdx, segments.length - 1)
       });
     }
     accGain = 0; peakGain = 0; accLoss = 0; realDplus = 0;
