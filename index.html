@@ -569,8 +569,8 @@ body.sport-running .pace-mode-row{align-items:center;gap:6px;font-size:10px;colo
   border-bottom:none;flex-wrap:wrap;
 }
 .tab-btn{
-  flex:1;min-width:100px;padding:8px 6px;font-family:'Inter',sans-serif;
-  font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  flex:1;min-width:60px;padding:8px 6px;font-family:'Inter',sans-serif;
+  font-size:20px;font-weight:600;letter-spacing:0;text-transform:none;
   border:none;background:transparent;color:var(--text2);cursor:pointer;
   border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;
   border-right:1px solid var(--border2);
@@ -3429,7 +3429,8 @@ const I18N={
   'run_z3':'Threshold',
   'run_z4':'Speed',
   'run_z5':'Sprint',
-  'btn_roadbook':'📄 Road Book PDF'
+  'btn_roadbook':'📄 Road Book PDF',
+  'rb_time':'TIME','rb_grade':'GRADE','rb_power':'POWER','rb_zone':'ZONE','rb_cumul':'CUMUL. TIME','rb_nutrition':'NUTRITION 🍌'
   },
   fr:{
   btn_gpx:'⊕ GPX',no_file:'— AUCUN FICHIER CHARGÉ —',
@@ -3483,7 +3484,7 @@ const I18N={
   lbl_threshold_pace:'Allure seuil',
   lbl_threshold_lthr:'FC seuil (LTHR)',
   lbl_run_lvl0:'Amateur (5:45/km)',
-  lbl_run_lvl1:'Trained (4:45/km)',
+  lbl_run_lvl1:'Entraîné(e) (4:45/km)',
   lbl_run_lvl2:'Elite (3:45/km)',
   btn_by_maxcal:'Max Kcal',
   lbl_maxcal:'Kcal max estimé'
@@ -3661,7 +3662,8 @@ const I18N={
   'run_z3':'Seuil',
   'run_z4':'Vitesse',
   'run_z5':'Sprint',
-  'btn_roadbook':'📄 Road Book PDF'
+  'btn_roadbook':'📄 Road Book PDF',
+  'rb_time':'TEMPS','rb_grade':'PENTE','rb_power':'PUISSANCE','rb_zone':'ZONE','rb_cumul':'TEMPS CUM.','rb_nutrition':'NUTRITION 🍌'
   },
   de:{
   btn_gpx:'⊕ GPX',no_file:'— KEINE DATEI GELADEN —',
@@ -3715,7 +3717,7 @@ const I18N={
   lbl_threshold_pace:'Schwellentempo',
   lbl_threshold_lthr:'Schwellen-HF (LTHR)',
   lbl_run_lvl0:'Amateur (5:45/km)',
-  lbl_run_lvl1:'Trained (4:45/km)',
+  lbl_run_lvl1:'Trainiert (4:45/km)',
   lbl_run_lvl2:'Elite (3:45/km)',
   btn_by_maxcal:'Max Kcal',
   lbl_maxcal:'Max geschätzte kcal'
@@ -3893,7 +3895,8 @@ const I18N={
   'run_z3':'Schwelle',
   'run_z4':'Geschw.',
   'run_z5':'Sprint',
-  'btn_roadbook':'📄 Road Book PDF'
+  'btn_roadbook':'📄 Road Book PDF',
+  'rb_time':'ZEIT','rb_grade':'STEIGUNG','rb_power':'LEISTUNG','rb_zone':'ZONE','rb_cumul':'KUM. ZEIT','rb_nutrition':'ERNÄHRUNG 🍌'
   },
   es:{
   btn_gpx:'⊕ GPX',no_file:'— NINGÚN ARCHIVO CARGADO —',
@@ -3947,7 +3950,7 @@ const I18N={
   lbl_threshold_pace:'Ritmo umbral',
   lbl_threshold_lthr:'FC umbral (LTHR)',
   lbl_run_lvl0:'Amateur (5:45/km)',
-  lbl_run_lvl1:'Trained (4:45/km)',
+  lbl_run_lvl1:'Entrenado/a (4:45/km)',
   lbl_run_lvl2:'Elite (3:45/km)',
   btn_by_maxcal:'Max Kcal',
   lbl_maxcal:'Kcal máx estimadas'
@@ -4107,7 +4110,8 @@ const I18N={
   'run_z3':'Umbral',
   'run_z4':'Velocidad',
   'run_z5':'Sprint',
-  'btn_roadbook':'📄 Road Book PDF'
+  'btn_roadbook':'📄 Road Book PDF',
+  'rb_time':'TIEMPO','rb_grade':'PENDIENTE','rb_power':'POTENCIA','rb_zone':'ZONA','rb_cumul':'TIEMPO AC.','rb_nutrition':'NUTRICIÓN 🍌'
   },
   it:{
   btn_gpx:'⊕ GPX',no_file:'— NESSUN FILE CARICATO —',
@@ -4161,7 +4165,7 @@ const I18N={
   lbl_threshold_pace:'Andatura soglia',
   lbl_threshold_lthr:'FC soglia (LTHR)',
   lbl_run_lvl0:'Amateur (5:45/km)',
-  lbl_run_lvl1:'Trained (4:45/km)',
+  lbl_run_lvl1:'Allenato/a (4:45/km)',
   lbl_run_lvl2:'Elite (3:45/km)',
   btn_by_maxcal:'Max Kcal',
   lbl_maxcal:'Kcal max stimate'
@@ -4321,7 +4325,8 @@ const I18N={
   'run_z3':'Soglia',
   'run_z4':'Velocità',
   'run_z5':'Sprint',
-  'btn_roadbook':'📄 Road Book PDF'
+  'btn_roadbook':'📄 Road Book PDF',
+  'rb_time':'TEMPO','rb_grade':'PENDENZA','rb_power':'POTENZA','rb_zone':'ZONA','rb_cumul':'TEMPO CUM.','rb_nutrition':'NUTRIZIONE 🍌'
   },
   nl:{
   btn_gpx:'⊕ GPX',no_file:'— GEEN BESTAND GELADEN —',
@@ -4375,7 +4380,7 @@ const I18N={
   lbl_threshold_pace:'Drempeltempo',
   lbl_threshold_lthr:'Drempel-HF (LTHR)',
   lbl_run_lvl0:'Amateur (5:45/km)',
-  lbl_run_lvl1:'Trained (4:45/km)',
+  lbl_run_lvl1:'Getraind (4:45/km)',
   lbl_run_lvl2:'Elite (3:45/km)',
   btn_by_maxcal:'Max Kcal',
   lbl_maxcal:'Max geschatte kcal'
@@ -4535,7 +4540,8 @@ const I18N={
   'run_z3':'Drempel',
   'run_z4':'Snelheid',
   'run_z5':'Sprint',
-  'btn_roadbook':'📄 Road Book PDF'
+  'btn_roadbook':'📄 Road Book PDF',
+  'rb_time':'TIJD','rb_grade':'STIJGING','rb_power':'VERMOGEN','rb_zone':'ZONE','rb_cumul':'CUM. TIJD','rb_nutrition':'VOEDING 🍌'
   }
 };
 
@@ -4978,19 +4984,19 @@ function _buildRoadBook(){
  const arrNoPause=formatTOD(hh,mm,totT);
  const arrPause=formatTOD(hh,mm,totTp);
  doc.text(
- `Departure: ${hh.toString().padStart(2,'0')}:${mm.toString().padStart(2,'0')} | Estimated arrival: ${arrNoPause} | With stops: ${arrPause}`,
+ `${t('lbl_start')} ${hh.toString().padStart(2,'0')}:${mm.toString().padStart(2,'0')} | ${t('lbl_arrival')} ${arrNoPause} | ${t('lbl_arrival_pause')} ${arrPause}`,
  ML,y
  );y+=7;
 
  // ── TABLE HEADER ──
  const cols=[
- {label:'KM', w:14, align:'center'},
- {label:'TIME', w:20, align:'center'},
- {label:'GRADE', w:18, align:'center'},
- {label:'POWER', w:18, align:'center'},
- {label:'ZONE', w:16, align:'center'},
- {label:'CUMUL. TIME', w:24, align:'center'},
- {label:'NUTRITION 🍌', w:CW-14-20-18-18-16-24, align:'center'},
+ {label:'KM',           w:14,             align:'center'},
+ {label:t('rb_time'),  w:20,             align:'center'},
+ {label:t('rb_grade'), w:18,             align:'center'},
+ {label:t('rb_power'), w:18,             align:'center'},
+ {label:t('rb_zone'),  w:16,             align:'center'},
+ {label:t('rb_cumul'), w:24,             align:'center'},
+ {label:t('rb_nutrition'), w:CW-14-20-18-18-16-24, align:'center'},
  ];
 
  const ROW_H=6.5;
@@ -5221,9 +5227,9 @@ function updateThresholdFromSlider(){
 //  SPORT SELECTOR
 // ══════════════════════════════════════════════════
 const SPORT_CONFIGS = {
-  hiking:     {hideFTP:true,  hidePower:true,  hidePowerZones:true,  hideVAM:false, hidePace:true,  maxOptDur:720,  label:'Randonnée'},
-  running:    {hideFTP:true,  hidePower:true,  hidePowerZones:true,  hideVAM:false, hidePace:false, maxOptDur:720,  label:'Course à pieds'},
-  cycling:    {hideFTP:false, hidePower:false, hidePowerZones:false, hideVAM:false, hidePace:true,  maxOptDur:720,  label:'Vélo de route'},
+  hiking:     {hideFTP:true,  hidePower:true,  hidePowerZones:true,  hideVAM:false, hidePace:true,  maxOptDur:720,  label:()=>t('sport_hiking')},
+  running:    {hideFTP:true,  hidePower:true,  hidePowerZones:true,  hideVAM:false, hidePace:false, maxOptDur:720,  label:()=>t('sport_running')},
+  cycling:    {hideFTP:false, hidePower:false, hidePowerZones:false, hideVAM:false, hidePace:true,  maxOptDur:720,  label:()=>t('sport_cycling')},
 };
 
 function setSport(sport){
