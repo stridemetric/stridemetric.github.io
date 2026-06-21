@@ -670,9 +670,9 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
  <div class="kpi kpi-last" data-i18n-label="kpi_carbkcal"><div class="kpi-label" data-i18n="kpi_carbkcal">Apport gluc.</div><div class="kpi-value" id="kpi-carbkcal">—</div><div class="kpi-unit">kcal</div></div>
   <!-- RUNNING — Pace -->
   <div class="kpi-group kpi-group-running kpi-group-green">
-    <div class="kpi"><div class="kpi-label">Allure moy.</div><div class="kpi-value" id="kpi-pace-avg">—</div><div class="kpi-unit">min/km</div></div>
-    <div class="kpi"><div class="kpi-label">Allure plat</div><div class="kpi-value" id="kpi-pace-flat">—</div><div class="kpi-unit">min/km</div></div>
-    <div class="kpi kpi-last"><div class="kpi-label">Allure montée</div><div class="kpi-value" id="kpi-pace-climb">—</div><div class="kpi-unit">min/km</div></div>
+    <div class="kpi" data-i18n-label="kpi_pace_avg"><div class="kpi-label" data-i18n="kpi_pace_avg">Allure moy.</div><div class="kpi-value" id="kpi-pace-avg">—</div><div class="kpi-unit">min/km</div></div>
+    <div class="kpi" data-i18n-label="kpi_pace_flat"><div class="kpi-label" data-i18n="kpi_pace_flat">Allure plat</div><div class="kpi-value" id="kpi-pace-flat">—</div><div class="kpi-unit">min/km</div></div>
+    <div class="kpi kpi-last" data-i18n-label="kpi_pace_climb"><div class="kpi-label" data-i18n="kpi_pace_climb">Allure montée</div><div class="kpi-value" id="kpi-pace-climb">—</div><div class="kpi-unit">min/km</div></div>
   </div>
  </div>
 
@@ -1266,34 +1266,52 @@ function calcPower(vKmh,gradePct){
   return Math.max(0,(m*g*v*gr+0.5*CdA*rho*v*v*v+m*g*Crr*v*Math.cos(Math.atan(gr)))/eta);
 }
 
-// ── Running power: ACSM VO₂ model → Watts equivalent ──
-// VO₂ (ml/kg/min) = 0.2×v_mmin + 0.9×v_mmin×grade + 3.5
-// Power = VO₂ × mass × 0.34 W·min/ml  (≈VO₂ in L/min × 5kcal/L → W)
-function calcPowerRunning(vKmh,gradePct){
-  const m=getVal('weight'),v_mmin=(vKmh/3.6)*60;
-  const grade=gradePct/100;
-  // ACSM running VO₂ (ml/kg/min) - includes vertical component
-  const vo2=0.2*v_mmin + 0.9*v_mmin*Math.max(0,grade) + 3.5;
-  // Convert to watts: 1 ml O₂/kg/min × mass_kg = ml O₂/min; ×0.05/60 ≈ W/kg
-  // 5 kcal/L O₂ = 5000 cal/L = 20.9 J/ml; power = vo2(ml/kg/min)*m(kg)*20.9/60
-  return Math.max(0, vo2 * m * 20.9 / 60);
+// ── Running power: Minetti et al. (2002) J Appl Physiol 93:1039-1046 ──
+// 5th-degree polynomial fit of treadmill metabolic data (-45% to +45% gradient)
+// Cr(i) = 155.4i⁵ − 30.4i⁴ − 43.3i³ + 46.3i² + 19.5i + 3.6  [J·kg⁻¹·m⁻¹]
+// Metabolic power P = Cr × mass × speed  (valid for all gradients, up & downhill)
+function calcPowerRunning(vKmh, gradePct) {
+  const m = getVal('weight');
+  const v = vKmh / 3.6;          // m/s
+  const i = gradePct / 100;      // gradient (dimensionless)
+  const i2=i*i, i3=i2*i, i4=i3*i, i5=i4*i;
+  const Cr = 155.4*i5 - 30.4*i4 - 43.3*i3 + 46.3*i2 + 19.5*i + 3.6;
+  return Math.max(0, Cr * m * v);
 }
 
-// ── Hiking power: Pandolf et al. load-carriage model ──
-// Metabolic rate (W) = 1.5×M + 2×(M+L)×(L/M)² + N×(M+L)×(1.5V²+0.35VG)
-// M=body kg, L=load kg (bike weight used), V=m/s, G=grade%
-// N=terrain factor (1.0 smooth trail)
-function calcPowerHiking(vKmh,gradePct){
-  const M=getVal('weight');
-  const L=getVal('bike-weight')||0; // bag/gear weight
-  const V=vKmh/3.6;
-  const G=gradePct; // % as decimal in formula: G in %
-  const N=1.0; // smooth trail
-  // Pandolf formula (W):
-  const W=1.5*M + 2*(M+L)*(L/M)*(L/M) + N*(M+L)*(1.5*V*V + 0.35*V*Math.abs(G));
-  // Add sex correction: women ~5% higher metabolic cost for same output
-  const sex=document.getElementById('sex')?.value||'M';
-  const sexFactor = sex==='F' ? 1.05 : 1.0;
+// ── Hiking power: Pandolf et al. (1977) J Appl Physiol 43:577-581 ──
+// Uphill / flat  (G ≥ 0): standard load-carriage formula
+//   Ṁ = 1.5W + 2(W+L)(L/W)² + η(W+L)(1.5V² + 0.35VG)
+// Downhill (G < 0): Pandolf flat-rate × Minetti 2002 walking cost ratio
+//   Cw(i) [J/kg/m] from 6th-degree polynomial fit of Minetti 2002 walking data
+//   (Herzog 2013, Internet Archaeology 36, based on Minetti et al. 2002)
+//   Cw(i) = 1337.8i⁶+278.19i⁵−517.39i⁴−78.199i³+93.419i²+19.825i+1.64
+//   Scale factor f(i) = Cw(i)/Cw(0) accounts for eccentric braking benefit on descent
+function calcPowerHiking(vKmh, gradePct) {
+  const M = getVal('weight');
+  const L = getVal('bike-weight') || 0;
+  const V = vKmh / 3.6;
+  const G = gradePct;         // grade in %  (positive = uphill)
+  const i = gradePct / 100;   // gradient decimal (for Minetti polynomial)
+  const N = 1.0;              // terrain factor (smooth trail)
+  const sex = document.getElementById('sex')?.value || 'M';
+  const sexFactor = sex === 'F' ? 1.05 : 1.0;
+
+  // Pandolf at G=0 (flat reference, used for downhill scaling)
+  const P_flat = 1.5*M + 2*(M+L)*(L/M)*(L/M) + N*(M+L)*1.5*V*V;
+
+  let W;
+  if (G >= 0) {
+    // Uphill / flat: full Pandolf formula
+    W = 1.5*M + 2*(M+L)*(L/M)*(L/M) + N*(M+L)*(1.5*V*V + 0.35*V*G);
+  } else {
+    // Downhill: Pandolf(flat) scaled by Minetti 2002 walking cost ratio
+    const i2=i*i, i3=i2*i, i4=i3*i, i5=i4*i, i6=i5*i;
+    const Cw_i  = 1337.8*i6 + 278.19*i5 - 517.39*i4 - 78.199*i3 + 93.419*i2 + 19.825*i + 1.64;
+    const Cw_0  = 1.64; // Minetti 2002: Cw at 0% = 1.64 J·kg⁻¹·m⁻¹
+    const f = Math.max(0.3, Cw_i / Cw_0); // scale factor ∈ [0.3, ~1] for typical downhill
+    W = P_flat * f;
+  }
   return Math.max(0, W * sexFactor);
 }
 function speedForPower(P,grade,v0=20){
@@ -3207,6 +3225,7 @@ const I18N={
   kpi_power_avg:'Avg power',kpi_power_eff:'Eff. power',
   kpi_hr_avg:'Avg HR',kpi_vam:'Climb rate',
   kpi_spd_flat:'Flat speed',kpi_spd_climb:'Climb speed',kpi_spd_avg:'Avg speed',
+  kpi_pace_avg:'Avg pace',kpi_pace_flat:'Flat pace',kpi_pace_climb:'Climb pace',
   kpi_energy:'Energy spent',kpi_carbs:'Carbs',kpi_carbkcal:'Carb intake',
   sec_profile:'Rider Profile',sec_hr:'Heart Rate',sec_ftp:'FTP Power',
   sec_speed:'Speed / Pace',sec_power:'Calculated Power',sec_zones_pwr:'Power Zones + VAM',
@@ -3440,6 +3459,7 @@ const I18N={
   kpi_power_avg:'Puiss. moy.',kpi_power_eff:'Puiss. eff.',
   kpi_hr_avg:'FC moyenne',kpi_vam:'VAM réelle',
   kpi_spd_flat:'V moy. plat',kpi_spd_climb:'V moy. mont.',kpi_spd_avg:'V moy. totale',
+  kpi_pace_avg:'Allure moy.',kpi_pace_flat:'Allure plat',kpi_pace_climb:'Allure montée',
   kpi_energy:'Énergie dépensée',kpi_carbs:'Glucides',kpi_carbkcal:'Apport gluc.',
   sec_profile:'Profil Cycliste',sec_hr:'Fréquence Cardiaque',sec_ftp:'Puissance FTP',
   sec_speed:'Vitesses / Allure',sec_power:'Puissance Calculée',sec_zones_pwr:'Zones Puissance + VAM',
@@ -3673,6 +3693,7 @@ const I18N={
   kpi_power_avg:'Ø Leistung',kpi_power_eff:'Eff. Leistung',
   kpi_hr_avg:'Ø Herzrate',kpi_vam:'Anstiegsrate',
   kpi_spd_flat:'Ø Ebene',kpi_spd_climb:'Ø Anstieg',kpi_spd_avg:'Ø Geschw.',
+  kpi_pace_avg:'Ø Tempo',kpi_pace_flat:'Tempo Ebene',kpi_pace_climb:'Tempo Anstieg',
   kpi_energy:'Energie verbraucht',kpi_carbs:'Kohlenhydrate',kpi_carbkcal:'KH-Zufuhr',
   sec_profile:'Fahrerprofil',sec_hr:'Herzfrequenz',sec_ftp:'FTP Leistung',
   sec_speed:'Geschwindigkeit',sec_power:'Berechnete Leistung',sec_zones_pwr:'Leistungszonen + VAM',
@@ -3906,6 +3927,7 @@ const I18N={
   kpi_power_avg:'Potencia med.',kpi_power_eff:'Potencia ef.',
   kpi_hr_avg:'FC media',kpi_vam:'VAM real',
   kpi_spd_flat:'V med. llano',kpi_spd_climb:'V med. subida',kpi_spd_avg:'V media total',
+  kpi_pace_avg:'Ritmo medio',kpi_pace_flat:'Ritmo llano',kpi_pace_climb:'Ritmo subida',
   kpi_energy:'Energía gastada',kpi_carbs:'Carbohidratos',kpi_carbkcal:'Aporte carb.',
   sec_profile:'Perfil Ciclista',sec_hr:'Frecuencia Cardíaca',sec_ftp:'Potencia FTP',
   sec_speed:'Velocidades',sec_power:'Potencia Calculada',sec_zones_pwr:'Zonas Potencia + VAM',
@@ -4121,6 +4143,7 @@ const I18N={
   kpi_power_avg:'Potenza med.',kpi_power_eff:'Potenza eff.',
   kpi_hr_avg:'FC media',kpi_vam:'VAM reale',
   kpi_spd_flat:'V med. pianura',kpi_spd_climb:'V med. salita',kpi_spd_avg:'V media totale',
+  kpi_pace_avg:'Ritmo medio',kpi_pace_flat:'Ritmo piano',kpi_pace_climb:'Ritmo salita',
   kpi_energy:'Energia spesa',kpi_carbs:'Carboidrati',kpi_carbkcal:'Apporto carb.',
   sec_profile:'Profilo Ciclista',sec_hr:'Frequenza Cardiaca',sec_ftp:'Potenza FTP',
   sec_speed:'Velocità',sec_power:'Potenza Calcolata',sec_zones_pwr:'Zone Potenza + VAM',
@@ -4336,6 +4359,7 @@ const I18N={
   kpi_power_avg:'Gem. vermogen',kpi_power_eff:'Eff. vermogen',
   kpi_hr_avg:'Gem. HF',kpi_vam:'Klimsnelheid',
   kpi_spd_flat:'Gem. vlak',kpi_spd_climb:'Gem. klimmen',kpi_spd_avg:'Gem. totaal',
+  kpi_pace_avg:'Gem. tempo',kpi_pace_flat:'Tempo vlak',kpi_pace_climb:'Tempo klimmen',
   kpi_energy:'Energie verbraucht',kpi_carbs:'Koolhydraten',kpi_carbkcal:'KH-inname',
   sec_profile:'Rijdersprofiel',sec_hr:'Hartfrequentie',sec_ftp:'FTP Vermogen',
   sec_speed:'Snelheden',sec_power:'Berekend Vermogen',sec_zones_pwr:'Vermogenszones + VAM',
