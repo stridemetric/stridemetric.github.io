@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>StrideMetric — Cycling Performance Calculator</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
@@ -64,7 +64,8 @@ html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;
 ═══════════════════════════════════════════════ */
 header{
  background:var(--panel);border-bottom:2px solid var(--border);
- padding:6px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+ padding:calc(6px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 6px calc(12px + env(safe-area-inset-left));
+ display:flex;align-items:center;gap:8px;flex-wrap:wrap;
  position:relative;
 }
 body:not(.light) header{background:linear-gradient(90deg,#0d1526,#1e293b,#0d1526)}
@@ -140,12 +141,12 @@ body:not(.light) .logo{text-shadow:0 0 16px rgba(59,130,246,.35)}
  MAIN LAYOUT
 ═══════════════════════════════════════════════ */
 .main-layout{display:flex;overflow:hidden;position:relative}
-.main-layout{height:calc(100vh - 104px)}
+.main-layout{height:calc(100vh - 104px);height:calc(100svh - 104px)}
 
 /* ═══════════════════════════════════════════════
  LEFT PANEL
 ═══════════════════════════════════════════════ */
-.left-panel{width:var(--lw);min-width:var(--lw);background:var(--panel);border-right:1px solid var(--border2);overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;z-index:10;transition:transform .3s ease,background .25s}
+.left-panel{width:var(--lw);min-width:var(--lw);background:var(--panel);border-right:1px solid var(--border2);overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;z-index:10;transition:transform .3s ease,background .25s;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .left-panel::-webkit-scrollbar{width:3px}
 .left-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
@@ -159,6 +160,10 @@ body:not(.light) .logo{text-shadow:0 0 16px rgba(59,130,246,.35)}
 .input-row input[type=number]{width:64px}
 .input-row select{width:94px;text-align:left}
 .input-row input[type=number]:focus,.input-row select:focus{border-color:var(--accent)}
+/* Prevent iOS auto-zoom on input focus (requires font-size ≥ 16px on touch) */
+@media(hover:none) and (pointer:coarse){
+  .input-row input[type=number],.input-row select{font-size:16px}
+}
 .unit{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);width:24px;flex-shrink:0}
 
 /* Sliders */
@@ -166,8 +171,12 @@ body:not(.light) .logo{text-shadow:0 0 16px rgba(59,130,246,.35)}
 .slider-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
 .slider-header label{font-size:11px;color:var(--text3)}
 .slider-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent2);font-weight:bold}
-input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:linear-gradient(90deg,#3b82f6 var(--pct,50%),var(--grid) var(--pct,50%));border-radius:2px;outline:none;cursor:pointer}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:linear-gradient(90deg,#3b82f6 var(--pct,50%),var(--grid) var(--pct,50%));border-radius:2px;outline:none;cursor:pointer;touch-action:pan-x}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;background:#e2e8f0;border-radius:50%;box-shadow:0 0 4px rgba(226,232,240,.3);cursor:pointer}
+/* Larger touch thumb on mobile */
+@media(hover:none) and (pointer:coarse){
+  input[type=range]::-webkit-slider-thumb{width:20px;height:20px}
+}
 
 /* Mini switch row */
 .sw-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;padding:2px 0}
@@ -227,17 +236,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 /* ═══════════════════════════════════════════════
  RIGHT AREA
 ═══════════════════════════════════════════════ */
-.right-area{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px;display:flex;flex-direction:column;gap:7px}
+.right-area{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px;display:flex;flex-direction:column;gap:7px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .right-area::-webkit-scrollbar{width:3px}
 .right-area::-webkit-scrollbar-thumb{background:var(--border)}
 
 .chart-container{background:var(--panel);border:1px solid var(--border2);padding:8px;transition:background .25s}
+.chart-container canvas{max-width:100%}
 .chart-header{font-family:'Inter',sans-serif;font-size:7px;color:var(--accent);letter-spacing:2px;margin-bottom:5px;display:flex;align-items:center;gap:6px;opacity:0.8}
 .chart-header::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
 canvas{display:block;image-rendering:crisp-edges}
 
 /* Timing strip */
-.timing-scroll{overflow-x:auto}
+.timing-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
 .timing-scroll::-webkit-scrollbar{height:3px}
 .timing-scroll::-webkit-scrollbar-thumb{background:var(--border)}
 .timing-table{display:flex;min-width:max-content}
@@ -286,16 +296,157 @@ canvas{display:block;image-rendering:crisp-edges}
 /* KPI group colors now handled by .kpi-grp-* classes */
 
 /* Mobile */
-@media(max-width:680px){
- .main-layout{height:calc(100vh - 88px)}
- .panel-toggle{display:block}
- .route-name{display:none}
- .left-panel{position:absolute;top:0;left:0;bottom:0;transform:translateX(-100%);box-shadow:4px 0 20px var(--shadow)}
- .left-panel.open{transform:translateX(0)}
- .kpi-value{font-size:15px}
- .kpi-group{gap:8px;padding-left:6px}
- .kpi-bar{gap:0 10px;padding:3px 6px}
- .logo{font-size:16px;letter-spacing:2px}
+/* ═══════════════════════════════════════════════
+ RESPONSIVE — 4 tiers
+ xs  : < 480px   (phones portrait)
+ sm  : 480–767px (phones landscape / phablets)
+ md  : 768–1023px (tablets)
+ lg  : ≥ 1024px  (desktop)
+═══════════════════════════════════════════════ */
+
+/* ── Tablet (md): panel always visible but narrower ── */
+@media(min-width:768px) and (max-width:1023px){
+  :root{--lw:220px}
+  .kpi-value{font-size:16px}
+}
+
+/* ── Desktop+ (lg) ── */
+@media(min-width:1024px){
+  :root{--lw:262px}
+}
+
+/* ── Phone + small tablet (< 768px): natural page scroll ── */
+@media(max-width:767px){
+  /* Sticky header so controls stay accessible while scrolling */
+  header{
+    position:sticky;
+    top:0;
+    z-index:50;
+  }
+
+  /* Let the page scroll naturally — no fixed-height clipping */
+  .main-layout{
+    height:auto !important;
+    min-height:0;
+    overflow:visible;
+    flex-direction:column;
+  }
+  .right-area{
+    overflow-y:visible;
+    overflow-x:hidden;
+    height:auto;
+    min-height:60vh;
+    -webkit-overflow-scrolling:unset;
+    overscroll-behavior:unset;
+  }
+
+  /* Tab nav sticks below header while scrolling */
+  .tab-nav{
+    position:sticky;
+    top:0;
+    z-index:40;
+    background:var(--panel2);
+    border-bottom:1px solid var(--border2);
+  }
+
+  /* Left panel: fixed overlay drawer */
+  .panel-toggle{display:block}
+  .route-name{display:none}
+  .left-panel{
+    position:fixed;
+    top:0;left:0;bottom:0;
+    height:100%;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    transform:translateX(-100%);
+    box-shadow:4px 0 20px var(--shadow);
+    z-index:100;
+  }
+  .left-panel.open{transform:translateX(0)}
+
+  .kpi-value{font-size:15px}
+  .kpi-group{gap:6px;padding-left:6px}
+  .kpi-bar{gap:0 10px;padding:3px 6px}
+  .logo{font-size:15px;letter-spacing:2px}
+  .timing-cell{min-width:50px}
+  .tc-time{font-size:10px}
+  .tc-km{font-size:10px}
+}
+
+/* ── Phone portrait (xs: < 480px) ── */
+@media(max-width:479px){
+  /* Header: keep GPX button on same row as logo */
+  header{padding:calc(4px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) 4px calc(8px + env(safe-area-inset-left));gap:5px;flex-wrap:nowrap;overflow:hidden}
+  .logo{font-size:13px;letter-spacing:1px}
+  .logo-sub{display:none}
+  .route-name{display:none}
+  .header-controls{gap:4px;flex-shrink:0}
+
+  /* Prevent iOS font-size zoom on input focus — must be ≥ 16px */
+  input[type=number],select,input[type=text],input[type=time]{
+    font-size:16px !important
+  }
+
+  /* KPI bar: tighter, smaller values */
+  .kpi-bar{padding:2px 6px;gap:0 8px}
+  .kpi-group{gap:5px;padding-left:4px}
+  .kpi{min-width:44px}
+  .kpi-value{font-size:13px}
+  .kpi-label{font-size:8px}
+  .kpi-unit{font-size:8px}
+
+  /* Tab buttons: taller for touch */
+  .tab-btn{font-size:18px;padding:6px 4px;min-width:44px}
+
+  /* Charts: minimum canvas height on phone */
+  .chart-container canvas{min-height:160px}
+
+  /* Timing: allow horizontal scroll, prevent overflow */
+  .timing-scroll{-webkit-overflow-scrolling:touch}
+  .timing-cell{min-width:46px}
+  .tc-time{font-size:9px}
+  .tc-km{font-size:9px;font-weight:700}
+
+  /* Nutrition/hydration tables: scrollable */
+  #nutr-table-content,#hydra-table-content{font-size:9px}
+
+  /* Sport bar: tighter buttons to fit more on screen */
+  .sport-btn{padding:4px 10px;font-size:10px;gap:3px}
+  .sport-btn .sp-icon{font-size:13px}
+
+  /* Right area: reduce gap between charts */
+  .right-area{gap:5px;padding:5px}
+
+  /* Chart headers: allow wrap */
+  .chart-header{white-space:normal;font-size:8px;letter-spacing:0.5px}
+
+  /* Climb chart header text won't overflow */
+  #climb-grade-charts-container{gap:5px}
+
+  /* Panel toggle: ensure minimum tap area */
+  .panel-toggle{min-width:44px;min-height:36px}
+
+  /* Switches: tap area */
+  .sw-wrap{padding:4px 0}
+
+  /* Section titles: don't letter-space too much */
+  .section-title{letter-spacing:1.5px}
+
+  /* Optimizer button: keep visible, tighten a bit */
+  .optimizer-open-btn{padding:6px 9px;font-size:10px;letter-spacing:1px}
+}
+
+/* ── Very small phones (< 360px) ── */
+@media(max-width:359px){
+  .logo{font-size:12px;letter-spacing:0.5px}
+  .kpi-value{font-size:12px}
+  .gpx-load-btn{font-size:9px;padding:4px 6px;letter-spacing:0.5px}
+  .header-controls .help-btn,
+  .header-controls .save-btn{display:none}
+
+  /* Optimizer button stays visible (primary action) — collapse to icon-only */
+  .optimizer-open-btn{padding:6px 8px;min-width:36px;justify-content:center}
+  .optimizer-open-btn .ob-txt{display:none}
 }
 
 /* ── LIGHT THEME contrast overrides ── */
@@ -384,6 +535,7 @@ body:not(.light) .input-row select{color:#e2e8f0}
   display:flex;align-items:center;gap:0;
   background:var(--panel2);border-bottom:1px solid var(--border2);
   padding:0 8px;height:36px;overflow-x:auto;flex-shrink:0;
+  -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
 }
 .sport-bar::-webkit-scrollbar{height:2px}
 .sport-btn{
@@ -504,14 +656,30 @@ body.sport-running .pace-mode-row{align-items:center;gap:6px;font-size:10px;colo
   .welcome-card h2{font-size:15px}
   .welcome-card .wc-steps{grid-template-columns:1fr}
 }
-@media(max-width:380px){
-  .welcome-card{padding:12px 14px}
+@media(max-width:479px){
+  .welcome-card{padding:12px 14px;font-size:11px;max-width:100%}
   .welcome-card h2{font-size:14px}
 }
 
 /* ── Help button ── */
 .help-btn{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:4px 8px;font-size:15px;cursor:pointer;border-radius:2px;transition:all .2s;line-height:1}
 .help-btn:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 8px rgba(59,130,246,.2)}
+
+/* ── Optimizer open button (magic wand) ── */
+.optimizer-open-btn{
+ display:flex;align-items:center;gap:6px;
+ background:linear-gradient(135deg,var(--accent3),var(--accent3-h));
+ border:1px solid var(--accent3);color:#fff;
+ padding:6px 12px;font-family:'Inter',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;
+ cursor:pointer;transition:all .2s;white-space:nowrap;border-radius:3px;
+ box-shadow:0 0 10px rgba(139,92,246,.35);
+ min-height:32px;
+}
+.optimizer-open-btn:hover{box-shadow:0 0 16px rgba(139,92,246,.6);transform:translateY(-1px)}
+.optimizer-open-btn:active{transform:translateY(0)}
+.optimizer-open-btn .ob-icon{font-size:15px;line-height:1}
+body.light .optimizer-open-btn{background:linear-gradient(135deg,#ce654d,#8f3331);border-color:#8f3331;box-shadow:0 0 10px rgba(143,51,49,.3)}
+body.light .optimizer-open-btn:hover{box-shadow:0 0 16px rgba(143,51,49,.5)}
 
 /* ── Help modal ── */
 .help-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;display:none;align-items:center;justify-content:center;padding:20px}
@@ -520,6 +688,10 @@ body.sport-running .pace-mode-row{align-items:center;gap:6px;font-size:10px;colo
 .help-modal-close{position:absolute;top:12px;right:14px;background:transparent;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1;transition:color .15s}
 .help-modal-close:hover{color:var(--accent)}
 .help-modal .welcome-card{max-width:100%;border:none;padding:0;background:transparent;box-shadow:none}
+.optimizer-modal{max-width:400px;padding:22px 20px 20px}
+@media(max-width:479px){
+  .optimizer-modal{padding:18px 14px 16px}
+}
 
 
 /* ── Physiological zone alert ── */
@@ -599,6 +771,7 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
  </div>
  <div class="route-name" id="route-name">— AUCUN FICHIER CHARGÉ —</div>
  <div class="header-controls">
+ <button class="optimizer-open-btn" id="optimizer-open-btn" title="Optimizer"><span class="ob-icon">🪄</span><span class="ob-txt" data-i18n="btn_optimize_open">Optimiser</span></button>
  <button class="help-btn" id="help-btn" title="Help">❓</button>
  <button class="save-btn" id="save-btn" title="Save settings"><span>💾</span><span class="save-tooltip">Save settings</span></button>
  <select id="lang-sel" style="background:var(--panel2);border:1px solid var(--border2);color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 5px;outline:none;cursor:pointer;border-radius:2px">
@@ -650,8 +823,8 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
  </div>
  <!-- Z3 JAUNE — PUISSANCE/CARDIO -->
  <div class="kpi-group kpi-group-yellow">
- <div class="kpi" data-i18n-label="kpi_power_avg"><div class="kpi-label" data-i18n="kpi_power_avg">Puiss. moy.</div><div class="kpi-value" id="kpi-power">—</div><div class="kpi-unit">W</div></div>
- <div class="kpi" data-i18n-label="kpi_power_eff"><div class="kpi-label" data-i18n="kpi_power_eff">Puiss. eff.</div><div class="kpi-value" id="kpi-effpower">—</div><div class="kpi-unit">W</div></div>
+ <div class="kpi" data-i18n-label="kpi_power_avg" data-hide-sports="hiking,running"><div class="kpi-label" data-i18n="kpi_power_avg">Puiss. moy.</div><div class="kpi-value" id="kpi-power">—</div><div class="kpi-unit">W</div></div>
+ <div class="kpi" data-i18n-label="kpi_power_eff" data-hide-sports="hiking,running"><div class="kpi-label" data-i18n="kpi_power_eff">Puiss. eff.</div><div class="kpi-value" id="kpi-effpower">—</div><div class="kpi-unit">W</div></div>
  <div class="kpi" data-i18n-label="kpi_wpkg" data-hide-sports="hiking,running"><div class="kpi-label" data-i18n="kpi_wpkg">W/kg</div><div class="kpi-value" id="kpi-wpkg">—</div><div class="kpi-unit">W/kg</div></div>
  <div class="kpi" data-i18n-label="kpi_hr_avg"><div class="kpi-label" data-i18n="kpi_hr_avg">FC moyenne</div><div class="kpi-value" id="kpi-hr-avg">—</div><div class="kpi-unit">bpm</div></div>
  <div class="kpi" data-i18n-label="kpi_vam"><div class="kpi-label" data-i18n="kpi_vam">VAM réelle</div><div class="kpi-value" id="kpi-vam">—</div><div class="kpi-unit">m/h</div></div>
@@ -668,13 +841,14 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
  <div class="kpi" data-i18n-label="kpi_energy"><div class="kpi-label" data-i18n="kpi_energy">Énergie dépensée</div><div class="kpi-value" id="kpi-energy">—</div><div class="kpi-unit">kcal</div></div>
  <div class="kpi" data-i18n-label="kpi_carbs"><div class="kpi-label" data-i18n="kpi_carbs">Glucides</div><div class="kpi-value" id="kpi-carbs">—</div><div class="kpi-unit">g total</div></div>
  <div class="kpi kpi-last" data-i18n-label="kpi_carbkcal"><div class="kpi-label" data-i18n="kpi_carbkcal">Apport gluc.</div><div class="kpi-value" id="kpi-carbkcal">—</div><div class="kpi-unit">kcal</div></div>
-  <!-- RUNNING — Pace -->
-  <div class="kpi-group kpi-group-running kpi-group-green">
+  </div>
+ <!-- RUNNING — Pace (separate group, shown only in running mode) -->
+ <div class="kpi-group kpi-group-running kpi-group-green">
     <div class="kpi" data-i18n-label="kpi_pace_avg"><div class="kpi-label" data-i18n="kpi_pace_avg">Allure moy.</div><div class="kpi-value" id="kpi-pace-avg">—</div><div class="kpi-unit">min/km</div></div>
     <div class="kpi" data-i18n-label="kpi_pace_flat"><div class="kpi-label" data-i18n="kpi_pace_flat">Allure plat</div><div class="kpi-value" id="kpi-pace-flat">—</div><div class="kpi-unit">min/km</div></div>
     <div class="kpi kpi-last" data-i18n-label="kpi_pace_climb"><div class="kpi-label" data-i18n="kpi_pace_climb">Allure montée</div><div class="kpi-value" id="kpi-pace-climb">—</div><div class="kpi-unit">min/km</div></div>
-  </div>
  </div>
+
 
 <!-- ═══════════════ MAIN LAYOUT ═══════════════ -->
 <div class="main-layout">
@@ -936,61 +1110,6 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
  <div class="stat-row" style="margin-top:3px"><span class="s-lbl" data-i18n="lbl_pause_total">Temps arrêt total</span><span class="s-val" id="pause-total-lbl">5 min</span></div>
  </div>
 
- <!-- OPTIMISEUR -->
- <div class="panel-block">
- <div class="section-title" data-sec="sec_optimizer">Optimiseur</div>
- <div class="model-tabs" id="opt-mode-tabs">
- <button class="model-tab active" data-omode="zone" data-i18n="btn_by_zone">Par zone</button>
- <button class="model-tab" data-omode="duration" data-i18n="btn_by_duration">Par durée</button>
- <button class="model-tab" data-omode="maxcal" data-i18n="btn_by_maxcal">Max Kcal</button>
- <button class="model-tab" data-omode="power" data-i18n="btn_by_power" data-hide-sports="hiking,running">Puissance W</button>
- </div>
-
- <div id="opt-zone-panel">
- <div class="zone-selector" id="zone-selector">
- <button class="zone-btn z1" data-zone="1">Z1</button>
- <button class="zone-btn z2" data-zone="2">Z2</button>
- <button class="zone-btn z3 active" data-zone="3">Z3</button>
- <button class="zone-btn z4" data-zone="4">Z4</button>
- <button class="zone-btn z5" data-zone="5">Z5</button>
- </div>
- </div>
-
- <div id="opt-duration-panel" style="display:none">
- <div class="slider-row" style="margin-top:4px">
- <div class="slider-header"><label data-i18n="lbl_target_dur">Durée cible</label><span class="slider-val" id="opt-dur-val">3h00</span></div>
- <input type="range" id="opt-duration" min="30" max="720" value="180" step="15">
- </div>
- <div style="font-size:8px;color:var(--accent3);font-family:'JetBrains Mono',monospace"><span data-i18n="lbl_auto_zone">Zone auto :</span> <span id="opt-auto-zone">—</span></div>
- </div>
-
- <!-- POWER W mode panel -->
- <div id="opt-power-panel" style="display:none">
-  <div class="input-row" style="margin-top:4px">
-   <label data-i18n="lbl_target_power">Puissance cible</label>
-   <input type="number" id="opt-target-power" value="200" min="50" max="600" step="5"
-     style="background:var(--inp-bg);border:1px solid var(--border2);color:var(--accent);
-            font-family:'JetBrains Mono',monospace;font-size:12px;padding:3px 5px;
-            outline:none;width:64px;text-align:right">
-   <span class="unit">W</span>
-  </div>
-  <div style="font-size:8px;color:var(--accent3);margin-top:3px;font-family:'JetBrains Mono',monospace" id="opt-power-ftp-pct">—</div>
- </div>
-
- <button class="opt-btn" id="opt-btn" data-i18n="btn_optimize">▶ OPTIMISER</button>
- <button class="apply-btn" id="apply-btn" data-i18n="btn_apply">↑ APPLIQUER CES VITESSES</button>
- <div class="opt-result">
- <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_target_zone">Zone cible</span><span class="opt-val" id="opt-zone-lbl">—</span></div>
- <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_power_target">Intensité cible</span><span class="opt-val" id="opt-power-range">—</span></div>
- <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_opt_flat">Vitesse plat optim.</span><span class="opt-val" id="opt-flat">—</span></div>
- <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_opt_climb">Vitesse montée optim.</span><span class="opt-val" id="opt-climb-kmh">—</span></div>
- <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_opt_vam">VAM montée optim.</span><span class="opt-val" id="opt-climb-vam">—</span></div>
- <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_opt_hr">FC cible estimée</span><span class="opt-val" id="opt-hr">—</span></div>
- <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_opt_time">Durée estimée</span><span class="opt-val" id="opt-time">—</span></div>
- <div class="opt-row" id="opt-maxcal-row" style="display:none"><span class="opt-lbl" style="color:var(--accent3)">⚡ Kcal max estimé</span><span class="opt-val" id="opt-maxcal">—</span></div>
- </div>
- </div>
-
 </div><!-- end left-panel -->
 
 <!-- ═══════════════ RIGHT AREA ═══════════════ -->
@@ -1175,6 +1294,68 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
     </ul>
     <div class="wc-cta" style="margin-top:12px" id="hm-cta">🎯 Once your GPX is loaded, StrideMetric guides you to adapt your pace and nutrition to your route.</div>
     <div style="text-align:right;margin-top:10px;font-size:11px;color:var(--text2)" id="hm-bye">Have a great outing! 🚶‍♂️🚴🏃</div>
+  </div>
+</div>
+
+<!-- ═══════ OPTIMIZER MODAL ═══════ -->
+<div class="help-modal-overlay" id="optimizer-modal-overlay">
+  <div class="help-modal optimizer-modal" id="optimizer-modal">
+    <button class="help-modal-close" id="optimizer-modal-close" title="Close">✕</button>
+
+    <div class="panel-block" style="background:transparent;border:none;padding:0">
+    <div class="section-title" data-sec="sec_optimizer">Optimiseur</div>
+    <div class="model-tabs" id="opt-mode-tabs">
+    <button class="model-tab active" data-omode="zone" data-i18n="btn_by_zone">Par zone</button>
+    <button class="model-tab" data-omode="duration" data-i18n="btn_by_duration">Par durée</button>
+    <button class="model-tab" data-omode="maxcal" data-i18n="btn_by_maxcal">Max Kcal</button>
+    <button class="model-tab" data-omode="power" data-i18n="btn_by_power" data-hide-sports="hiking,running">Puissance W</button>
+    </div>
+
+    <div id="opt-zone-panel">
+    <div class="zone-selector" id="zone-selector">
+    <button class="zone-btn z1" data-zone="1">Z1</button>
+    <button class="zone-btn z2" data-zone="2">Z2</button>
+    <button class="zone-btn z3 active" data-zone="3">Z3</button>
+    <button class="zone-btn z4" data-zone="4">Z4</button>
+    <button class="zone-btn z5" data-zone="5">Z5</button>
+    </div>
+    </div>
+
+    <div id="opt-duration-panel" style="display:none">
+    <div class="slider-row" style="margin-top:4px">
+    <div class="slider-header"><label data-i18n="lbl_target_dur">Durée cible</label><span class="slider-val" id="opt-dur-val">3h00</span></div>
+    <input type="range" id="opt-duration" min="30" max="720" value="180" step="15">
+    </div>
+    <div style="font-size:8px;color:var(--accent3);font-family:'JetBrains Mono',monospace"><span data-i18n="lbl_auto_zone">Zone auto :</span> <span id="opt-auto-zone">—</span></div>
+    </div>
+
+    <!-- POWER W mode panel -->
+    <div id="opt-power-panel" style="display:none">
+     <div class="input-row" style="margin-top:4px">
+      <label data-i18n="lbl_target_power">Puissance cible</label>
+      <input type="number" id="opt-target-power" value="200" min="50" max="600" step="5"
+        style="background:var(--inp-bg);border:1px solid var(--border2);color:var(--accent);
+               font-family:'JetBrains Mono',monospace;font-size:12px;padding:3px 5px;
+               outline:none;width:64px;text-align:right">
+      <span class="unit">W</span>
+     </div>
+     <div style="font-size:8px;color:var(--accent3);margin-top:3px;font-family:'JetBrains Mono',monospace" id="opt-power-ftp-pct">—</div>
+    </div>
+
+    <button class="opt-btn" id="opt-btn" data-i18n="btn_optimize">▶ OPTIMISER</button>
+    <button class="apply-btn" id="apply-btn" data-i18n="btn_apply">↑ APPLIQUER CES VITESSES</button>
+    <div class="opt-result">
+    <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_target_zone">Zone cible</span><span class="opt-val" id="opt-zone-lbl">—</span></div>
+    <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_power_target">Intensité cible</span><span class="opt-val" id="opt-power-range">—</span></div>
+    <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_opt_flat">Vitesse plat optim.</span><span class="opt-val" id="opt-flat">—</span></div>
+    <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_opt_climb">Vitesse montée optim.</span><span class="opt-val" id="opt-climb-kmh">—</span></div>
+    <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_opt_vam">VAM montée optim.</span><span class="opt-val" id="opt-climb-vam">—</span></div>
+    <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_opt_hr">FC cible estimée</span><span class="opt-val" id="opt-hr">—</span></div>
+    <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_opt_time">Durée estimée</span><span class="opt-val" id="opt-time">—</span></div>
+    <div class="opt-row" id="opt-maxcal-row" style="display:none"><span class="opt-lbl" style="color:var(--accent3)">⚡ Kcal max estimé</span><span class="opt-val" id="opt-maxcal">—</span></div>
+    </div>
+    </div>
+
   </div>
 </div>
 
@@ -1971,6 +2152,7 @@ function drawPaceDistChart(segs){
     container.style.display = 'none';
     return;
   }
+  container.style.display = '';
 
   const hdr = document.getElementById('pace-dist-header');
   if(hdr) hdr.textContent = sport === 'running'
@@ -3250,7 +3432,7 @@ const I18N={
   lbl_carb_hint:'Intakes shown above elevation profile.',
   lbl_nb_pauses:'Number of stops',lbl_pause_dur:'Duration per stop',lbl_pause_total:'Total stop time',
   btn_by_zone:'By zone',btn_by_duration:'By duration',lbl_target_dur:'Target duration',
-  lbl_auto_zone:'Auto zone:',btn_optimize:'▶ OPTIMIZE',btn_apply:'↑ APPLY THESE SPEEDS',
+  lbl_auto_zone:'Auto zone:',btn_optimize:'▶ OPTIMIZE',btn_optimize_open:'Optimize',btn_apply:'↑ APPLY THESE SPEEDS',
   lbl_target_zone:'Target zone',lbl_power_target:'Target power',
   lbl_opt_flat:'Optimal flat speed',lbl_opt_climb:'Optimal climb speed',
   lbl_opt_vam:'Optimal climb VAM',lbl_opt_hr:'Target HR',lbl_opt_time:'Estimated time',
@@ -3484,7 +3666,7 @@ const I18N={
   lbl_carb_hint:'Les prises sont indiquées au-dessus du profil altimétrique.',
   lbl_nb_pauses:'Nombre de pauses',lbl_pause_dur:'Durée par pause',lbl_pause_total:'Temps arrêt total',
   btn_by_zone:'Par zone',btn_by_duration:'Par durée',lbl_target_dur:'Durée cible',
-  lbl_auto_zone:'Zone auto :',btn_optimize:'▶ OPTIMISER',btn_apply:'↑ APPLIQUER CES VITESSES',
+  lbl_auto_zone:'Zone auto :',btn_optimize:'▶ OPTIMISER',btn_optimize_open:'Optimiser',btn_apply:'↑ APPLIQUER CES VITESSES',
   lbl_target_zone:'Zone cible',lbl_power_target:'Puissance cible',
   lbl_opt_flat:'Vitesse plat optim.',lbl_opt_climb:'Vitesse montée optim.',
   lbl_opt_vam:'VAM montée optim.',lbl_opt_hr:'FC cible estimée',lbl_opt_time:'Durée estimée',
@@ -3718,7 +3900,7 @@ const I18N={
   lbl_carb_hint:'Einnahmen werden über dem Höhenprofil angezeigt.',
   lbl_nb_pauses:'Anzahl Pausen',lbl_pause_dur:'Dauer pro Pause',lbl_pause_total:'Gesamte Pausenzeit',
   btn_by_zone:'Nach Zone',btn_by_duration:'Nach Dauer',lbl_target_dur:'Zieldauer',
-  lbl_auto_zone:'Auto-Zone:',btn_optimize:'▶ OPTIMIEREN',btn_apply:'↑ GESCHW. ANWENDEN',
+  lbl_auto_zone:'Auto-Zone:',btn_optimize:'▶ OPTIMIEREN',btn_optimize_open:'Optimieren',btn_apply:'↑ GESCHW. ANWENDEN',
   lbl_target_zone:'Zielzone',lbl_power_target:'Zielleistung',
   lbl_opt_flat:'Opt. Ebene Geschw.',lbl_opt_climb:'Opt. Anstieg Geschw.',
   lbl_opt_vam:'Opt. Anstieg VAM',lbl_opt_hr:'Ziel-HF',lbl_opt_time:'Geschätzte Zeit',
@@ -3952,7 +4134,7 @@ const I18N={
   lbl_carb_hint:'Las tomas se muestran sobre el perfil altimétrico.',
   lbl_nb_pauses:'Número de paradas',lbl_pause_dur:'Duración por parada',lbl_pause_total:'Tiempo parada total',
   btn_by_zone:'Por zona',btn_by_duration:'Por duración',lbl_target_dur:'Duración objetivo',
-  lbl_auto_zone:'Zona auto:',btn_optimize:'▶ OPTIMIZAR',btn_apply:'↑ APLICAR VELOCIDADES',
+  lbl_auto_zone:'Zona auto:',btn_optimize:'▶ OPTIMIZAR',btn_optimize_open:'Optimizar',btn_apply:'↑ APLICAR VELOCIDADES',
   lbl_target_zone:'Zona objetivo',lbl_power_target:'Potencia objetivo',
   lbl_opt_flat:'V llano óptima',lbl_opt_climb:'V subida óptima',
   lbl_opt_vam:'VAM subida óptima',lbl_opt_hr:'FC objetivo',lbl_opt_time:'Tiempo estimado',
@@ -4168,7 +4350,7 @@ const I18N={
   lbl_carb_hint:'Le assunzioni sono mostrate sopra il profilo altimetrico.',
   lbl_nb_pauses:'Numero di soste',lbl_pause_dur:'Durata per sosta',lbl_pause_total:'Tempo sosta totale',
   btn_by_zone:'Per zona',btn_by_duration:'Per durata',lbl_target_dur:'Durata obiettivo',
-  lbl_auto_zone:'Zona auto:',btn_optimize:'▶ OTTIMIZZA',btn_apply:'↑ APPLICA VELOCITÀ',
+  lbl_auto_zone:'Zona auto:',btn_optimize:'▶ OTTIMIZZA',btn_optimize_open:'Ottimizza',btn_apply:'↑ APPLICA VELOCITÀ',
   lbl_target_zone:'Zona obiettivo',lbl_power_target:'Potenza obiettivo',
   lbl_opt_flat:'V pianura ottim.',lbl_opt_climb:'V salita ottim.',
   lbl_opt_vam:'VAM salita ottim.',lbl_opt_hr:'FC obiettivo',lbl_opt_time:'Tempo stimato',
@@ -4384,7 +4566,7 @@ const I18N={
   lbl_carb_hint:'Innames worden boven het hoogteprofiel weergegeven.',
   lbl_nb_pauses:'Aantal pauzes',lbl_pause_dur:'Duur per pauze',lbl_pause_total:'Totale pauzetijd',
   btn_by_zone:'Per zone',btn_by_duration:'Per duur',lbl_target_dur:'Doelduur',
-  lbl_auto_zone:'Auto zone:',btn_optimize:'▶ OPTIMALISEER',btn_apply:'↑ SNELHEDEN TOEPASSEN',
+  lbl_auto_zone:'Auto zone:',btn_optimize:'▶ OPTIMALISEER',btn_optimize_open:'Optimaliseren',btn_apply:'↑ SNELHEDEN TOEPASSEN',
   lbl_target_zone:'Doelzone',lbl_power_target:'Doelvermogen',
   lbl_opt_flat:'Opt. vlakke snelheid',lbl_opt_climb:'Opt. klimsnelheid',
   lbl_opt_vam:'Opt. klimmen VAM',lbl_opt_hr:'Doel HF',lbl_opt_time:'Geschatte tijd',
@@ -5507,6 +5689,23 @@ function initHelpModal(){
   btn.addEventListener('click', () => {
     overlay.classList.add('open');
     applyHelpModalTranslations();
+  });
+  closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if(e.key==='Escape') overlay.classList.remove('open'); });
+}
+
+// ══════════════════════════════════════════════════
+//  OPTIMIZER MODAL (opened via the magic-wand header button)
+// ══════════════════════════════════════════════════
+function initOptimizerModal(){
+  const btn = document.getElementById('optimizer-open-btn');
+  const overlay = document.getElementById('optimizer-modal-overlay');
+  const closeBtn = document.getElementById('optimizer-modal-close');
+  if(!btn||!overlay) return;
+
+  btn.addEventListener('click', () => {
+    overlay.classList.add('open');
   });
   closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
   overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
@@ -6895,6 +7094,7 @@ if(!_hadSavedSettings){
 }
 applyWelcomeTranslations();
 initHelpModal();
+initOptimizerModal();
 </script>
 <footer style="text-align:center;padding:8px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);background:var(--panel);border-top:1px solid var(--border2);letter-spacing:1px">
  © 2026 StrideMetric
