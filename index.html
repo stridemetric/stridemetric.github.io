@@ -380,7 +380,12 @@ canvas{display:block;image-rendering:crisp-edges}
   .logo{font-size:13px;letter-spacing:1px}
   .logo-sub{display:none}
   .route-name{display:none}
-  .header-controls{gap:4px;flex-shrink:0}
+  .header-controls{gap:4px;flex:1 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end}
+
+  /* Optimizer button: icon-only from this breakpoint down, to save header space
+     and guarantee the settings/GPX buttons stay on-screen and tappable */
+  .optimizer-open-btn{padding:6px 8px;min-width:36px;justify-content:center}
+  .optimizer-open-btn .ob-txt{display:none}
 
   /* Prevent iOS font-size zoom on input focus — must be ≥ 16px */
   input[type=number],select,input[type=text],input[type=time]{
@@ -431,9 +436,6 @@ canvas{display:block;image-rendering:crisp-edges}
 
   /* Section titles: don't letter-space too much */
   .section-title{letter-spacing:1.5px}
-
-  /* Optimizer button: keep visible, tighten a bit */
-  .optimizer-open-btn{padding:6px 9px;font-size:10px;letter-spacing:1px}
 }
 
 /* ── Very small phones (< 360px) ── */
@@ -443,10 +445,6 @@ canvas{display:block;image-rendering:crisp-edges}
   .gpx-load-btn{font-size:9px;padding:4px 6px;letter-spacing:0.5px}
   .header-controls .help-btn,
   .header-controls .save-btn{display:none}
-
-  /* Optimizer button stays visible (primary action) — collapse to icon-only */
-  .optimizer-open-btn{padding:6px 8px;min-width:36px;justify-content:center}
-  .optimizer-open-btn .ob-txt{display:none}
 }
 
 /* ── LIGHT THEME contrast overrides ── */
@@ -848,6 +846,7 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
     <div class="kpi" data-i18n-label="kpi_pace_flat"><div class="kpi-label" data-i18n="kpi_pace_flat">Allure plat</div><div class="kpi-value" id="kpi-pace-flat">—</div><div class="kpi-unit">min/km</div></div>
     <div class="kpi kpi-last" data-i18n-label="kpi_pace_climb"><div class="kpi-label" data-i18n="kpi_pace_climb">Allure montée</div><div class="kpi-value" id="kpi-pace-climb">—</div><div class="kpi-unit">min/km</div></div>
  </div>
+</div><!-- end kpi-bar -->
 
 
 <!-- ═══════════════ MAIN LAYOUT ═══════════════ -->
@@ -1245,6 +1244,12 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
     <div class="chart-container" id="pace-dist-container">
       <div class="chart-header" id="pace-dist-header" data-i18n="chart_pace_dist">RÉPARTITION ALLURE PAR ZONE</div>
       <canvas id="pace-dist-canvas"></canvas>
+    </div>
+
+    <!-- RACE PREDICTOR (running only) -->
+    <div class="chart-container" id="race-predictor-container" data-hide-sports="hiking,cycling">
+      <div class="chart-header" data-i18n="chart_race_predictor">PRÉDICTEUR DE COURSE</div>
+      <div id="race-predictor-body"></div>
     </div>
 
   </div><!-- end tab-physio -->
@@ -3536,6 +3541,7 @@ const I18N={
   ,
   'chart_hr_dist':'HR ZONE DISTRIBUTION',
   'chart_pace_dist':'PACE ZONE DISTRIBUTION',
+  'chart_race_predictor':'RACE PREDICTOR','race_predictor_note':'Estimates based on the threshold pace set in Settings.','rp_col_distance':'Distance','rp_col_time':'Time','rp_col_pace':'Pace','rp_dist_5k':'5 km','rp_dist_10k':'10 km','rp_dist_half':'Half marathon','rp_dist_marathon':'Marathon',
   'chart_power_dist':'POWER ZONE DISTRIBUTION',
   'chart_nutr':'NUTRITION SUMMARY',
   'chart_hydra':'HYDRATION SUMMARY'
@@ -3598,7 +3604,7 @@ const I18N={
   'climb_legend_3':'3 to 5.9%',
   'climb_legend_6':'6 to 8.9%',
   'climb_legend_9':'9%+',
-  'climb_pct_label':'Avg % per km',
+  'climb_pct_label':'Avg % per km','climb_pct_label_100m':'Avg % per 100m',
   'climb_ascent_label':'ASCENT',
   'climb_start_word':'Start',
   'climb_at_word':' at ',
@@ -3770,6 +3776,7 @@ const I18N={
   ,
   'chart_hr_dist':'RÉPARTITION FRÉQUENCE CARDIAQUE PAR ZONE',
   'chart_pace_dist':'RÉPARTITION ALLURE PAR ZONE',
+  'chart_race_predictor':'PRÉDICTEUR DE COURSE','race_predictor_note':'Estimations basées sur l\'allure de seuil renseignée dans les réglages.','rp_col_distance':'Distance','rp_col_time':'Temps','rp_col_pace':'Allure','rp_dist_5k':'5 km','rp_dist_10k':'10 km','rp_dist_half':'Semi-marathon','rp_dist_marathon':'Marathon',
   'chart_power_dist':'RÉPARTITION PUISSANCE PAR ZONE',
   'chart_nutr':'RÉSUMÉ NUTRITION',
   'chart_hydra':'RÉSUMÉ HYDRATATION'
@@ -3832,7 +3839,7 @@ const I18N={
   'climb_legend_3':'De 3 à 5,9%',
   'climb_legend_6':'De 6 à 8,9%',
   'climb_legend_9':'À partir de 9%',
-  'climb_pct_label':'Pourcentage moyen par km',
+  'climb_pct_label':'Pourcentage moyen par km','climb_pct_label_100m':'Pourcentage moyen par 100m',
   'climb_ascent_label':'ASCENSION',
   'climb_start_word':'Départ',
   'climb_at_word':' à ',
@@ -4004,6 +4011,7 @@ const I18N={
   ,
   'chart_hr_dist':'HF-ZONEN VERTEILUNG',
   'chart_pace_dist':'TEMPO-ZONEN VERTEILUNG',
+  'chart_race_predictor':'RENNVORHERSAGE','race_predictor_note':'Schätzungen basierend auf dem in den Einstellungen festgelegten Schwellentempo.','rp_col_distance':'Distanz','rp_col_time':'Zeit','rp_col_pace':'Tempo','rp_dist_5k':'5 km','rp_dist_10k':'10 km','rp_dist_half':'Halbmarathon','rp_dist_marathon':'Marathon',
   'chart_power_dist':'LEISTUNGSZONEN VERTEILUNG',
   'chart_nutr':'ERNÄHRUNGS-ZUSAMMENFASSUNG',
   'chart_hydra':'FLÜSSIGKEITS-ZUSAMMENFASSUNG'
@@ -4066,7 +4074,7 @@ const I18N={
   'climb_legend_3':'3 bis 5,9%',
   'climb_legend_6':'6 bis 8,9%',
   'climb_legend_9':'Ab 9%',
-  'climb_pct_label':'Ø % pro km',
+  'climb_pct_label':'Ø % pro km','climb_pct_label_100m':'Ø % pro 100m',
   'climb_ascent_label':'ANSTIEG',
   'climb_start_word':'Start',
   'climb_at_word':' bei ',
@@ -4238,6 +4246,7 @@ const I18N={
   ,
   'chart_hr_dist':'DISTRIBUCIÓN ZONAS FC',
   'chart_pace_dist':'DISTRIBUCIÓN ZONAS RITMO',
+  'chart_race_predictor':'PREDICTOR DE CARRERA','race_predictor_note':'Estimaciones basadas en el ritmo umbral indicado en los ajustes.','rp_col_distance':'Distancia','rp_col_time':'Tiempo','rp_col_pace':'Ritmo','rp_dist_5k':'5 km','rp_dist_10k':'10 km','rp_dist_half':'Media maratón','rp_dist_marathon':'Maratón',
   'chart_power_dist':'DISTRIBUCIÓN ZONAS POTENCIA',
   'chart_nutr':'RESUMEN NUTRICIÓN',
   'chart_hydra':'RESUMEN HIDRATACIÓN'
@@ -4290,7 +4299,7 @@ const I18N={
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
   'climb_col_grade':'Pend. media',
-  'climb_col_km_start':'Km inicio','climb_col_km_end':'Km fin','climb_col_alt_start':'Alt. inicio','climb_col_alt_end':'Alt. fin','chart_climb_grade':'PENDIENTE — ASCENSO','climb_legend_title':'LEYENDA','climb_legend_0':'De 0 a 2,9%','climb_legend_3':'De 3 a 5,9%','climb_legend_6':'De 6 a 8,9%','climb_legend_9':'A partir de 9%','climb_pct_label':'% medio por km','climb_ascent_label':'ASCENSO','climb_start_word':'Inicio','climb_at_word':' a ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Escala','zoom_window':'Ventana',
+  'climb_col_km_start':'Km inicio','climb_col_km_end':'Km fin','climb_col_alt_start':'Alt. inicio','climb_col_alt_end':'Alt. fin','chart_climb_grade':'PENDIENTE — ASCENSO','climb_legend_title':'LEYENDA','climb_legend_0':'De 0 a 2,9%','climb_legend_3':'De 3 a 5,9%','climb_legend_6':'De 6 a 8,9%','climb_legend_9':'A partir de 9%','climb_pct_label':'% medio por km','climb_pct_label_100m':'% medio por 100m','climb_ascent_label':'ASCENSO','climb_start_word':'Inicio','climb_at_word':' a ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Escala','zoom_window':'Ventana',
   'pwr_z1':'Recuperación',
   'pwr_z2':'Resistencia',
   'pwr_z3':'Tempo',
@@ -4454,6 +4463,7 @@ const I18N={
   ,
   'chart_hr_dist':'DISTRIBUZIONE ZONE FC',
   'chart_pace_dist':'DISTRIBUZIONE ZONE PASSO',
+  'chart_race_predictor':'PREDITTORE DI GARA','race_predictor_note':'Stime basate sul passo soglia impostato nelle impostazioni.','rp_col_distance':'Distanza','rp_col_time':'Tempo','rp_col_pace':'Passo','rp_dist_5k':'5 km','rp_dist_10k':'10 km','rp_dist_half':'Mezza maratona','rp_dist_marathon':'Maratona',
   'chart_power_dist':'DISTRIBUZIONE ZONE POTENZA',
   'chart_nutr':'RIEPILOGO NUTRIZIONE',
   'chart_hydra':'RIEPILOGO IDRATAZIONE'
@@ -4506,7 +4516,7 @@ const I18N={
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
   'climb_col_grade':'Pend. media',
-  'climb_col_km_start':'Km inizio','climb_col_km_end':'Km fine','climb_col_alt_start':'Alt. inizio','climb_col_alt_end':'Alt. fine','chart_climb_grade':'PENDENZA — SALITA','climb_legend_title':'LEGENDA','climb_legend_0':'Da 0 a 2,9%','climb_legend_3':'Da 3 a 5,9%','climb_legend_6':'Da 6 a 8,9%','climb_legend_9':'Dal 9%','climb_pct_label':'% media per km','climb_ascent_label':'SALITA','climb_start_word':'Partenza','climb_at_word':' a ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Scala','zoom_window':'Finestra',
+  'climb_col_km_start':'Km inizio','climb_col_km_end':'Km fine','climb_col_alt_start':'Alt. inizio','climb_col_alt_end':'Alt. fine','chart_climb_grade':'PENDENZA — SALITA','climb_legend_title':'LEGENDA','climb_legend_0':'Da 0 a 2,9%','climb_legend_3':'Da 3 a 5,9%','climb_legend_6':'Da 6 a 8,9%','climb_legend_9':'Dal 9%','climb_pct_label':'% media per km','climb_pct_label_100m':'% media per 100m','climb_ascent_label':'SALITA','climb_start_word':'Partenza','climb_at_word':' a ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Scala','zoom_window':'Finestra',
   'pwr_z1':'Recupero',
   'pwr_z2':'Resistenza',
   'pwr_z3':'Tempo',
@@ -4670,6 +4680,7 @@ const I18N={
   ,
   'chart_hr_dist':'HF-ZONE VERDELING',
   'chart_pace_dist':'TEMPO-ZONE VERDELING',
+  'chart_race_predictor':'WEDSTRIJDVOORSPELLER','race_predictor_note':'Schattingen op basis van het in de instellingen ingestelde drempeltempo.','rp_col_distance':'Afstand','rp_col_time':'Tijd','rp_col_pace':'Tempo','rp_dist_5k':'5 km','rp_dist_10k':'10 km','rp_dist_half':'Halve marathon','rp_dist_marathon':'Marathon',
   'chart_power_dist':'VERMOGENS-ZONE VERDELING',
   'chart_nutr':'VOEDINGS-SAMENVATTING',
   'chart_hydra':'HYDRATATIE-SAMENVATTING'
@@ -4722,7 +4733,7 @@ const I18N={
   'climb_col_dplus':'D+',
   'climb_col_dist':'Afst.',
   'climb_col_grade':'Gem. helling',
-  'climb_col_km_start':'Start km','climb_col_km_end':'Eind km','climb_col_alt_start':'Start hoogte','climb_col_alt_end':'Eind hoogte','chart_climb_grade':'STIJGING PER 100m','climb_legend_title':'LEGENDA','climb_legend_0':'0 tot 2,9%','climb_legend_3':'3 tot 5,9%','climb_legend_6':'6 tot 8,9%','climb_legend_9':'Vanaf 9%','climb_pct_label':'Gem. % per km','climb_ascent_label':'BEKLIMMING','climb_start_word':'Start','climb_at_word':' bij ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Schaal','zoom_window':'Venster',
+  'climb_col_km_start':'Start km','climb_col_km_end':'Eind km','climb_col_alt_start':'Start hoogte','climb_col_alt_end':'Eind hoogte','chart_climb_grade':'STIJGING PER 100m','climb_legend_title':'LEGENDA','climb_legend_0':'0 tot 2,9%','climb_legend_3':'3 tot 5,9%','climb_legend_6':'6 tot 8,9%','climb_legend_9':'Vanaf 9%','climb_pct_label':'Gem. % per km','climb_pct_label_100m':'Gem. % per 100m','climb_ascent_label':'BEKLIMMING','climb_start_word':'Start','climb_at_word':' bij ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Schaal','zoom_window':'Venster',
   'pwr_z1':'Herstel',
   'pwr_z2':'Duurvermogen',
   'pwr_z3':'Tempo',
@@ -4804,6 +4815,7 @@ function applyTranslations(){
  if(window._lastClimbs && typeof drawClimbGradeCharts==='function') drawClimbGradeCharts(window._lastClimbs);
  applyWelcomeTranslations();
  applyHelpModalTranslations();
+ if(typeof buildRacePredictorTable==='function') buildRacePredictorTable();
 }
 document.getElementById('lang-sel').addEventListener('change',e=>{
  currentLang=e.target.value;
@@ -5402,6 +5414,113 @@ function renderRunningZones(){
   });
 }
 
+// ══════════════════════════════════════════════════
+//  RACE PREDICTOR (Garmin/COROS-style) — running only
+//  Model: Riegel's exponential race-time formula, anchored
+//  on the threshold pace (assumed ≈ a 1-hour race effort).
+//  time(D) = 3600s * (D / D_ref)^1.06,  D_ref = 3600 / T(sec/km)
+// ══════════════════════════════════════════════════
+let rpCustomDist = 15; // km, persists across rebuilds
+const RACE_PREDICTOR_DISTANCES = [
+  { key:'5k',       km:5 },
+  { key:'10k',      km:10 },
+  { key:'half',     km:21.0975 },
+  { key:'marathon', km:42.195 },
+];
+
+function predictRaceTimeSec(distKm){
+  const T = getThresholdSecPerKm(); // sec/km at threshold
+  if(!distKm || distKm<=0 || !T) return 0;
+  const dRef = 3600 / T; // km covered in 1h at threshold pace
+  return 3600 * Math.pow(distKm / dRef, 1.06);
+}
+
+function formatDurationHMS(totalSec){
+  totalSec = Math.max(0, Math.round(totalSec));
+  const h = Math.floor(totalSec/3600);
+  const m = Math.floor((totalSec%3600)/60);
+  const s = totalSec%60;
+  if(h>0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+// Build (or rebuild) the full table structure — call on init, language change, or theme-relevant rebuilds.
+// Preserves the custom-distance input's current value across rebuilds.
+function buildRacePredictorTable(){
+  const body = document.getElementById('race-predictor-body');
+  if(!body) return;
+
+  const existingCustomInp = document.getElementById('rp-custom-dist');
+  if(existingCustomInp) rpCustomDist = parseFloat(existingCustomInp.value) || rpCustomDist;
+
+  let html = `<div style="font-size:9px;color:var(--text2);padding:0 2px 7px;font-style:italic">${t('race_predictor_note')}</div>`;
+  html += '<table style="width:100%;border-collapse:collapse;font-size:10px;font-family:\'JetBrains Mono\',monospace">';
+  html += '<thead><tr style="color:var(--accent);font-size:9px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border2)">';
+  html += `<th style="padding:4px 6px;text-align:left">${t('rp_col_distance')}</th>`;
+  html += `<th style="padding:4px 6px;text-align:center">${t('rp_col_time')}</th>`;
+  html += `<th style="padding:4px 6px;text-align:center">${t('rp_col_pace')}</th>`;
+  html += '</tr></thead><tbody>';
+
+  RACE_PREDICTOR_DISTANCES.forEach((d,i)=>{
+    const rowBg = i%2===0 ? 'background:var(--panel2)' : '';
+    html += `<tr style="${rowBg};border-top:1px solid var(--border2)">`;
+    html += `<td style="padding:5px 6px;color:var(--text);font-weight:700">${t('rp_dist_'+d.key)}</td>`;
+    html += `<td style="padding:5px 6px;text-align:center;color:var(--accent)" id="rp-${d.key}-time">—</td>`;
+    html += `<td style="padding:5px 6px;text-align:center;color:var(--text2)" id="rp-${d.key}-pace">—</td>`;
+    html += '</tr>';
+  });
+
+  // Custom distance row — editable input
+  html += `<tr style="background:var(--panel2);border-top:1px solid var(--border2)">`;
+  html += `<td style="padding:5px 6px;color:var(--text);font-weight:700">
+      <input type="number" id="rp-custom-dist" value="${rpCustomDist}" min="0.1" max="300" step="0.1"
+        style="background:var(--inp-bg);border:1px solid var(--border2);color:var(--accent);
+               font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 4px;
+               outline:none;width:52px;text-align:right">
+      <span class="unit" style="margin-left:3px">km</span>
+    </td>`;
+  html += `<td style="padding:5px 6px;text-align:center;color:var(--accent)" id="rp-custom-time">—</td>`;
+  html += `<td style="padding:5px 6px;text-align:center;color:var(--text2)" id="rp-custom-pace">—</td>`;
+  html += '</tr>';
+
+  html += '</tbody></table>';
+  body.innerHTML = html;
+
+  const customInp = document.getElementById('rp-custom-dist');
+  if(customInp){
+    customInp.addEventListener('input', ()=>{
+      rpCustomDist = parseFloat(customInp.value) || 0;
+      updateRacePredictorValues();
+    });
+  }
+
+  updateRacePredictorValues();
+}
+
+// Lightweight recompute — call whenever threshold pace changes. Does NOT touch the input's focus/value.
+function updateRacePredictorValues(){
+  if(currentSport !== 'running') return;
+  const body = document.getElementById('race-predictor-body');
+  if(!body || !document.getElementById('rp-5k-time')) return; // table not built yet
+
+  RACE_PREDICTOR_DISTANCES.forEach(d=>{
+    const timeSec = predictRaceTimeSec(d.km);
+    const paceSec = timeSec / d.km;
+    const timeEl = document.getElementById(`rp-${d.key}-time`);
+    const paceEl = document.getElementById(`rp-${d.key}-pace`);
+    if(timeEl) timeEl.textContent = formatDurationHMS(timeSec);
+    if(paceEl) paceEl.textContent = formatPaceSec(paceSec) + '/km';
+  });
+
+  const customKm = rpCustomDist;
+  const customTimeSec = predictRaceTimeSec(customKm);
+  const customPaceSec = customKm>0 ? customTimeSec / customKm : 0;
+  const ctEl = document.getElementById('rp-custom-time');
+  const cpEl = document.getElementById('rp-custom-pace');
+  if(ctEl) ctEl.textContent = customKm>0 ? formatDurationHMS(customTimeSec) : '—';
+  if(cpEl) cpEl.textContent = customKm>0 ? formatPaceSec(customPaceSec) + '/km' : '—';
+}
+
 // Auto-estimate threshold pace from level slider
 function getAutoThresholdPace(level){
   // Amateur(0)=5:45, Entraîné(1)=4:45, Au top(2)=3:45
@@ -5539,7 +5658,7 @@ function setSport(sport){
     if(climbSpdRowR) climbSpdRowR.style.display=''; // always show
     updateSlider('spd-flat'); updateSlider('spd-climb');
     renderRunningZones();
-  } else { // cycling
+    updateRacePredictorValues();
     if(flatSlider){flatSlider.min=10;flatSlider.max=60;if(parseFloat(flatSlider.value)<10)flatSlider.value=30;}
     if(climbSlider){climbSlider.min=4;climbSlider.max=30;if(parseFloat(climbSlider.value)<4)climbSlider.value=12;}
     if(descentRow) descentRow.style.display='';
@@ -5662,17 +5781,18 @@ document.querySelectorAll('.sport-btn').forEach(btn=>{
     const isAuto=sw.classList.contains('on');
     if(autoPanel) autoPanel.style.display=isAuto?'':'none';
     if(manualPanel) manualPanel.style.display=isAuto?'none':'';
+    updateRacePredictorValues();
   });
 
   const lvlSlider=document.getElementById('threshold-level');
   if(lvlSlider){
     updateThresholdFromSlider(); // init
-    lvlSlider.addEventListener('input',updateThresholdFromSlider);
+    lvlSlider.addEventListener('input',()=>{updateThresholdFromSlider();updateRacePredictorValues();});
   }
   // Manual pace/LTHR changes
   ['threshold-pace','threshold-lthr'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) el.addEventListener('change',()=>{renderRunningZones();if(gpxData)calcRoute();});
+    if(el) el.addEventListener('change',()=>{renderRunningZones();updateRacePredictorValues();if(gpxData)calcRoute();});
   });
 })();
 
@@ -6850,8 +6970,10 @@ function _drawClimbGradeChart(cv, segs, climb, idx) {
     return finePts[finePts.length - 1].ele;
   }
 
-  // ── 1km columns (equal width, last one prorated if dist isn't a whole km) ──
-  const N = Math.max(1, Math.round(climb.dist));
+  // ── Columns: 100m granularity for running/hiking, 1km for cycling (unchanged) ──
+  const isFineScale = (currentSport === 'running' || currentSport === 'hiking');
+  const colUnitKm = isFineScale ? 0.1 : 1;
+  const N = Math.max(1, Math.round(climb.dist / colUnitKm));
   const colDist = climb.dist / N;
   const boundaries = [];
   for (let k = 0; k <= N; k++) {
@@ -6956,7 +7078,8 @@ function _drawClimbGradeChart(cv, segs, climb, idx) {
       ctx.fillText(colGrade[k] % 1 === 0 ? colGrade[k].toFixed(0) : colGrade[k].toFixed(1), xc, baseY + rowH - 3);
       ctx.font = 'bold 8px JetBrains Mono, monospace';
       ctx.fillStyle = '#ffd24a';
-      ctx.fillText(String(k + 1), xc, baseY + rowH + rowH - 3);
+      const colLabel = isFineScale ? Math.round(boundaries[k + 1].dist * 1000) : String(k + 1);
+      ctx.fillText(String(colLabel), xc, baseY + rowH + rowH - 3);
     }
   }
   ctx.beginPath();
@@ -6968,7 +7091,7 @@ function _drawClimbGradeChart(cv, segs, climb, idx) {
   ctx.textAlign = 'right';
   ctx.font = 'italic 7.5px Inter, sans-serif';
   ctx.fillStyle = text2;
-  ctx.fillText(t('climb_pct_label'), W - PAD.r, baseY - 4);
+  ctx.fillText(isFineScale ? t('climb_pct_label_100m') : t('climb_pct_label'), W - PAD.r, baseY - 4);
 
   // ── Legend (top-left) ──
   const legendItems = [
@@ -7095,6 +7218,7 @@ if(!_hadSavedSettings){
 applyWelcomeTranslations();
 initHelpModal();
 initOptimizerModal();
+buildRacePredictorTable();
 </script>
 <footer style="text-align:center;padding:8px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);background:var(--panel);border-top:1px solid var(--border2);letter-spacing:1px">
  © 2026 StrideMetric
