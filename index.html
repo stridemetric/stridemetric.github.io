@@ -58,6 +58,13 @@ body.light {
 ═══════════════════════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;height:100%;overflow-x:hidden;transition:background .25s,color .25s}
+/* Below 1024px the page just scrolls normally (see the <1024px block
+   further down) — body stays a plain block. At 1024px+ it becomes a flex
+   column instead (see the desktop media query): header/sport-bar/kpi-bar/
+   footer keep their natural height and main-layout takes whatever is left.
+   That replaces a hardcoded "header is 104px" guess that broke as soon as
+   the header wrapped to 2 lines — the actual cause of the broken /
+   misaligned scrollbars on desktop. */
 
 /* ═══════════════════════════════════════════════
  HEADER
@@ -140,15 +147,20 @@ body:not(.light) .logo{text-shadow:0 0 16px rgba(59,130,246,.35)}
 /* ═══════════════════════════════════════════════
  MAIN LAYOUT
 ═══════════════════════════════════════════════ */
-.main-layout{display:flex;overflow:hidden;position:relative}
-.main-layout{height:calc(100vh - 104px);height:calc(100svh - 104px)}
+.main-layout{display:flex;overflow:hidden;position:relative;flex:1 1 auto;min-height:0}
 
 /* ═══════════════════════════════════════════════
  LEFT PANEL
 ═══════════════════════════════════════════════ */
-.left-panel{width:var(--lw);min-width:var(--lw);background:var(--panel);border-right:1px solid var(--border2);overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;z-index:10;transition:transform .3s ease,background .25s;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.left-panel::-webkit-scrollbar{width:3px}
-.left-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.left-panel{width:var(--lw);min-width:var(--lw);background:var(--panel);border-right:1px solid var(--border2);overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;z-index:10;transition:transform .3s ease,background .25s;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+/* Without this, flex children default to flex-shrink:1 and get visually
+   squashed to fit the visible height instead of overflowing — which is
+   what made the panel look "broken" instead of simply scrolling. */
+.left-panel>*{flex-shrink:0}
+.left-panel::-webkit-scrollbar{width:9px}
+.left-panel::-webkit-scrollbar-track{background:transparent}
+.left-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px;border:2px solid var(--panel);background-clip:padding-box}
+.left-panel::-webkit-scrollbar-thumb:hover{background:var(--text2);border:2px solid var(--panel);background-clip:padding-box}
 
 .section-title{font-family:'Inter',sans-serif;font-weight:600;font-size:9px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;border-bottom:1px solid var(--border2);padding-bottom:3px;margin-bottom:5px;opacity:0.9}
 .panel-block{background:var(--panel2);border:1px solid var(--border2);padding:8px;transition:background .25s}
@@ -236,9 +248,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 /* ═══════════════════════════════════════════════
  RIGHT AREA
 ═══════════════════════════════════════════════ */
-.right-area{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px;display:flex;flex-direction:column;gap:7px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.right-area::-webkit-scrollbar{width:3px}
-.right-area::-webkit-scrollbar-thumb{background:var(--border)}
+.right-area{flex:1;min-width:0;overflow-y:auto;overflow-x:hidden;padding:8px;display:flex;flex-direction:column;gap:7px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+/* Same fix as .left-panel above: stop chart/KPI blocks from being
+   squashed to fit and let them overflow into a proper scrollbar instead. */
+.right-area>*{flex-shrink:0}
+.right-area::-webkit-scrollbar{width:9px}
+.right-area::-webkit-scrollbar-track{background:transparent}
+.right-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px;border:2px solid var(--bg);background-clip:padding-box}
+.right-area::-webkit-scrollbar-thumb:hover{background:var(--text2);border:2px solid var(--bg);background-clip:padding-box}
 
 .chart-container{background:var(--panel);border:1px solid var(--border2);padding:8px;transition:background .25s}
 .chart-container canvas{max-width:100%}
@@ -304,19 +321,36 @@ canvas{display:block;image-rendering:crisp-edges}
  lg  : ≥ 1024px  (desktop)
 ═══════════════════════════════════════════════ */
 
-/* ── Tablet (md): panel always visible but narrower ── */
+/* ── Tablet (md): uses the same drawer layout as phone (see the
+   max-width:1023px block below) — a fixed-height 2-column layout with
+   its own inner scrollbars was unreliable at tablet widths (header
+   wraps, viewport units behave inconsistently), so tablets now get the
+   same single natural page-scroll everyone already relies on for
+   phones. Just give it a bit more room since there's space to spare. ── */
 @media(min-width:768px) and (max-width:1023px){
-  :root{--lw:220px}
+  :root{--lw:300px}
   .kpi-value{font-size:16px}
 }
 
-/* ── Desktop+ (lg) ── */
+/* ── Desktop+ (lg): fixed-height 2-column layout — left panel and main
+   column each scroll independently inside a viewport-locked shell. ── */
 @media(min-width:1024px){
   :root{--lw:262px}
+  body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+  header,.sport-bar,.kpi-bar,footer{flex-shrink:0}
 }
 
-/* ── Phone + small tablet (< 768px): natural page scroll ── */
-@media(max-width:767px){
+/* ── Phone + tablet (< 1024px): natural page scroll ── */
+@media(max-width:1023px){
+  /* Because of the overflow-x:hidden set on html/body above, the browser
+     treats body — not the page/viewport — as the actual scrolling box.
+     Made explicit here (rather than relying on that auto-conversion) and
+     given momentum scrolling, which iOS Safari won't do on its own —
+     this was the main reason scrolling felt sluggish/broken on phone. */
+  body{
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
   /* Sticky header so controls stay accessible while scrolling */
   header{
     position:sticky;
@@ -363,7 +397,14 @@ canvas{display:block;image-rendering:crisp-edges}
     z-index:100;
   }
   .left-panel.open{transform:translateX(0)}
+  /* Lock the background page while the drawer is open, so touch-scrolling
+     inside it never "leaks" through to the page behind. */
+  body.drawer-open{overflow:hidden;height:100vh;height:100dvh}
+}
 
+/* ── Phone only (sm/xs: < 768px): tighter text/KPI sizing.
+   Tablets (768–1023px) keep the roomier sizing from the md block above. ── */
+@media(max-width:767px){
   .kpi-value{font-size:15px}
   .kpi-group{gap:6px;padding-left:6px}
   .kpi-bar{gap:0 10px;padding:3px 6px}
@@ -3250,8 +3291,18 @@ document.getElementById('apply-btn').addEventListener('click',applyOptimizer);
 // ══════════════════════════════════════════════════
 // MOBILE TOGGLE
 // ══════════════════════════════════════════════════
-document.getElementById('panel-toggle').addEventListener('click',()=>document.getElementById('left-panel').classList.toggle('open'));
-document.getElementById('right-area').addEventListener('click',()=>document.getElementById('left-panel').classList.remove('open'));
+// Open/close the left-panel drawer (phone + tablet). While it's open we lock
+// background scrolling so a touch-drag inside the drawer can't "leak" and
+// scroll the page behind it — this was the main cause of the janky/broken
+// feeling scrollbar on tablet and smartphone.
+function setLeftPanelOpen(open){
+  document.getElementById('left-panel').classList.toggle('open', open);
+  document.body.classList.toggle('drawer-open', open);
+}
+document.getElementById('panel-toggle').addEventListener('click',()=>{
+  setLeftPanelOpen(!document.getElementById('left-panel').classList.contains('open'));
+});
+document.getElementById('right-area').addEventListener('click',()=>setLeftPanelOpen(false));
 
 // ══════════════════════════════════════════════════
 // DRAG AND DROP
@@ -6514,8 +6565,10 @@ function applyFTPauto(on){
 }
 
 function applySportDefaults(sport){
-  // Weight — common to all
-  setVal('weight', 75);
+  // Poids corps : NE PAS réinitialiser lors d'un changement de sport.
+  // Comme l'âge, le poids est un paramètre du profil coureur, saisi une
+  // seule fois et partagé entre tous les sports (randonnée / course / vélo).
+  // (anciennement : setVal('weight', 75); — supprimé, c'était le bug)
 
   if(sport === 'cycling'){
     // FC max auto ON, FTP auto ON
