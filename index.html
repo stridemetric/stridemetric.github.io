@@ -84,7 +84,7 @@ body:not(.light) .logo{text-shadow:0 0 16px rgba(59,130,246,.35)}
 .logo-sub{font-size:8px;color:var(--text2);letter-spacing:1px;font-family:'JetBrains Mono',monospace;white-space:nowrap}
 .route-name{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .header-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-left:auto}
-.gpx-load-btn{background:linear-gradient(135deg,var(--panel2),var(--panel3));border:1px solid var(--accent);color:var(--accent);padding:6px 12px;font-family:'Inter',sans-serif;font-weight:600;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s;white-space:nowrap;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))}
+.gpx-load-btn{background:linear-gradient(135deg,var(--panel2),var(--panel3));border:1px solid var(--accent);color:var(--accent);padding:6px 12px;font-family:'Inter',sans-serif;font-weight:600;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s;white-space:nowrap;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));display:inline-flex;align-items:center;justify-content:center;gap:4px}
 .gpx-load-btn:hover{box-shadow:0 0 10px rgba(59,130,246,.35)}
 #gpx-input{display:none}
 .panel-toggle{display:none;background:var(--panel2);border:1px solid var(--border2);color:var(--accent2);padding:5px 9px;font-family:'Inter',sans-serif;font-weight:600;font-size:11px;cursor:pointer}
@@ -152,7 +152,7 @@ body:not(.light) .logo{text-shadow:0 0 16px rgba(59,130,246,.35)}
 /* ═══════════════════════════════════════════════
  LEFT PANEL
 ═══════════════════════════════════════════════ */
-.left-panel{width:var(--lw);min-width:var(--lw);background:var(--panel);border-right:1px solid var(--border2);overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;z-index:10;transition:transform .3s ease,background .25s;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.left-panel{width:var(--lw);min-width:var(--lw);background:var(--panel);border-right:1px solid var(--border2);overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;z-index:10;transition:transform .3s ease,background .25s;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y pinch-zoom;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 /* Without this, flex children default to flex-shrink:1 and get visually
    squashed to fit the visible height instead of overflowing — which is
    what made the panel look "broken" instead of simply scrolling. */
@@ -248,7 +248,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 /* ═══════════════════════════════════════════════
  RIGHT AREA
 ═══════════════════════════════════════════════ */
-.right-area{flex:1;min-width:0;overflow-y:auto;overflow-x:hidden;padding:8px;display:flex;flex-direction:column;gap:7px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.right-area{flex:1;min-width:0;overflow-y:auto;overflow-x:hidden;padding:8px;display:flex;flex-direction:column;gap:7px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y pinch-zoom;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 /* Same fix as .left-panel above: stop chart/KPI blocks from being
    squashed to fit and let them overflow into a proper scrollbar instead. */
 .right-area>*{flex-shrink:0}
@@ -421,12 +421,18 @@ canvas{display:block;image-rendering:crisp-edges}
   .logo{font-size:13px;letter-spacing:1px}
   .logo-sub{display:none}
   .route-name{display:none}
-  .header-controls{gap:4px;flex:1 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end}
+  .header-controls{gap:4px;flex:1 1 auto;min-width:0;flex-wrap:nowrap;justify-content:flex-end;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .header-controls::-webkit-scrollbar{display:none}
 
-  /* Optimizer button: icon-only from this breakpoint down, to save header space
-     and guarantee the settings/GPX buttons stay on-screen and tappable */
-  .optimizer-open-btn{padding:6px 8px;min-width:36px;justify-content:center}
-  .optimizer-open-btn .ob-txt{display:none}
+  /* Action buttons: identical square icon-only size from this breakpoint
+     down, so Optimiser/Aide/Sauver/Charger/GPX all fit on one row instead
+     of some being hidden entirely on narrow screens */
+  .optimizer-open-btn,.help-btn,.save-btn,#header-gpx-btn,.panel-toggle{
+    width:32px;height:32px;min-width:32px;min-height:32px;
+    padding:0;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;gap:0;
+  }
+  .optimizer-open-btn .ob-txt,#header-gpx-btn .gpx-txt{display:none}
 
   /* Prevent iOS font-size zoom on input focus — must be ≥ 16px */
   input[type=number],select,input[type=text],input[type=time]{
@@ -469,9 +475,6 @@ canvas{display:block;image-rendering:crisp-edges}
   /* Climb chart header text won't overflow */
   #climb-grade-charts-container{gap:5px}
 
-  /* Panel toggle: ensure minimum tap area */
-  .panel-toggle{min-width:44px;min-height:36px}
-
   /* Switches: tap area */
   .sw-wrap{padding:4px 0}
 
@@ -483,9 +486,6 @@ canvas{display:block;image-rendering:crisp-edges}
 @media(max-width:359px){
   .logo{font-size:12px;letter-spacing:0.5px}
   .kpi-value{font-size:12px}
-  .gpx-load-btn{font-size:9px;padding:4px 6px;letter-spacing:0.5px}
-  .header-controls .help-btn,
-  .header-controls .save-btn{display:none}
 }
 
 /* ── LIGHT THEME contrast overrides ── */
@@ -780,16 +780,23 @@ body.light .optimizer-open-btn:hover{box-shadow:0 0 16px rgba(143,51,49,.5)}
   border-bottom:none;flex-wrap:wrap;
 }
 .tab-btn{
-  flex:1;min-width:60px;padding:8px 6px;font-family:'Inter',sans-serif;
-  font-size:20px;font-weight:600;letter-spacing:0;text-transform:none;
+  flex:1;min-width:60px;padding:6px 6px;font-family:'Inter',sans-serif;
+  font-weight:600;letter-spacing:0;text-transform:none;
   border:none;background:transparent;color:var(--text2);cursor:pointer;
   border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;
   border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
 }
+.tab-btn .tab-emoji{font-size:18px;line-height:1}
+.tab-btn .tab-label{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:0.85}
 .tab-btn:last-child{border-right:none}
 .tab-btn:hover{color:var(--text);border-bottom-color:var(--border)}
 .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--panel)}
 body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
+/* Profile/Physio/Nutrition tabs need an actual route loaded — hidden
+   until a GPX file is loaded (JS reveals them then). The Zones tab has
+   no such requirement and is always available. */
+.tab-btn-gpx-only{display:none}
 .tab-content{display:flex;flex-direction:column;gap:7px}
 /* New zoom sliders */
 .zoom-slider-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
@@ -798,15 +805,15 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
 .zoom-slider-wrap{flex:1;min-width:100px}
 </style>
 </head>
-<body>
+<body class="light">
 
 <!-- ═══════════════ HEADER ═══════════════ -->
 <header>
  <div class="logo-block">
  <div style="display:flex;align-items:baseline;gap:6px">
  <img src="data:image/png;base64,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" alt="StrideMetric" style="height:40px;width:auto;display:block;object-fit:contain;image-rendering:auto">
- <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text2);letter-spacing:1px;align-self:flex-end;margin-bottom:3px">v3.2</span>
  </div>
+ <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text2);letter-spacing:1px;align-self:flex-start;margin-top:1px">v3.31</span>
  </div>
  <div class="route-name" id="route-name">— AUCUN FICHIER CHARGÉ —</div>
  <div class="header-controls">
@@ -825,11 +832,11 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
  </select>
  <label class="sw-wrap" title="Light / Dark theme">
  <span class="sw-label">☀</span>
- <div class="sw" id="sw-theme"></div>
+ <div class="sw on" id="sw-theme"></div>
  <span class="sw-label">●</span>
  </label>
  <button class="panel-toggle" id="panel-toggle">⚙</button>
- <label class="gpx-load-btn" for="gpx-input" data-i18n="btn_gpx">⊕ GPX</label>
+ <label class="gpx-load-btn" id="header-gpx-btn" for="gpx-input"><span class="btn-icon">⊕</span><span class="gpx-txt" data-i18n="btn_gpx">GPX</span></label>
  <input type="file" id="gpx-input" accept=".gpx">
  </div>
 </header>
@@ -1006,12 +1013,6 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
   </div>
  </div>
 
- <!-- RUNNING ZONE TABLE -->
- <div class="panel-block" id="run-zone-panel" style="display:none">
-  <div class="section-title">Zones Course à Pied</div>
-  <div id="run-zone-table"></div>
- </div>
-
  <!-- VITESSES -->
  <div class="panel-block">
  <div class="section-title" data-sec="sec_speed">Vitesses / Allure</div>
@@ -1066,18 +1067,6 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
  <span class="czi-desc" id="czi-desc">—</span>
  <span class="czi-hr" id="czi-hr" style="color:var(--accent)">—</span>
  </div>
- </div>
-
- <!-- ZONES PUISSANCE -->
- <div class="panel-block" data-hide-sports="hiking,running">
- <div class="section-title" data-sec="sec_zones_pwr">Zones Puissance + VAM</div>
- <div class="zones-grid" id="zones-grid"></div>
- </div>
-
- <!-- ZONES FC -->
- <div class="panel-block">
- <div class="section-title" data-sec="sec_zones_hr">Zones Fréquence Cardiaque</div>
- <div class="hr-zones" id="hr-zones"></div>
  </div>
 
  <!-- NUTRITION -->
@@ -1158,6 +1147,70 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
 
 <!-- ═══════════════ RIGHT AREA ═══════════════ -->
 <div class="right-area" id="right-area">
+
+ <!-- ── TAB NAVIGATION (always visible — Zones works without a GPX file;
+      Profile/Physio/Nutrition need a loaded route and appear once one is
+      loaded, see revealGpxTabs()) ── -->
+ <div class="tab-nav" id="tab-nav">
+   <button class="tab-btn tab-btn-gpx-only" data-tab="profile"><span class="tab-emoji">🗺️</span><span class="tab-label" data-i18n="tab_profile">Parcours</span></button>
+   <button class="tab-btn tab-btn-gpx-only" data-tab="physio"><span class="tab-emoji">💓</span><span class="tab-label" data-i18n="tab_physio">Effort</span></button>
+   <button class="tab-btn tab-btn-gpx-only" data-tab="nutrition"><span class="tab-emoji">🍌</span><span class="tab-label" data-i18n="tab_nutrition">Ravito</span></button>
+   <button class="tab-btn active" data-tab="zones"><span class="tab-emoji">📊</span><span class="tab-label" data-i18n="tab_zones">Mes zones</span></button>
+ </div>
+
+ <!-- ══ TAB 4: ZONES (FC, Puissance, Course à pied) + prédicteurs — always available ══ -->
+ <div id="tab-zones" class="tab-content">
+
+   <!-- PRÉDICTEUR DE FTP -->
+   <div class="chart-container" id="ftp-predictor-container" data-hide-sports="hiking,running">
+     <div class="chart-header" data-i18n="chart_ftp_predictor">PRÉDICTEUR DE FTP (À PARTIR D'UNE ASCENSION)</div>
+     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+       <div class="input-row" style="margin:0">
+         <label data-i18n="lbl_ftppred_dplus">Dénivelé D+</label>
+         <input type="number" id="ftppred-dplus" value="1000" min="10" max="6000" step="10">
+         <span class="unit">m</span>
+       </div>
+       <div class="input-row" style="margin:0">
+         <label data-i18n="lbl_ftppred_duration">Durée de l'ascension</label>
+         <input type="number" id="ftppred-duration" value="45" min="1" max="480" step="1">
+         <span class="unit" data-i18n="unit_min">min</span>
+       </div>
+     </div>
+     <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_ftppred_avgpower">Puissance moyenne estimée</span><span class="opt-val" id="ftppred-avgpower">—</span></div>
+     <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_ftppred_factor">Facteur correctif (durée)</span><span class="opt-val" id="ftppred-factor">—</span></div>
+     <div class="opt-row"><span class="opt-lbl" data-i18n="lbl_ftppred_result">FTP estimée (~60 min)</span><span class="opt-val" id="ftppred-result" style="color:var(--accent);font-weight:700">—</span></div>
+     <div style="margin-top:6px">
+       <button id="ftppred-apply-btn" style="font-family:'Inter',sans-serif;font-size:9px;font-weight:600;letter-spacing:1px;background:var(--panel2);border:1px solid var(--border);color:var(--text3);padding:4px 10px;cursor:pointer;transition:all .2s;border-radius:2px" data-i18n="btn_ftppred_apply">✓ UTILISER CETTE FTP</button>
+     </div>
+     <div style="font-size:8px;color:var(--text2);margin-top:6px;font-family:'JetBrains Mono',monospace" data-i18n="lbl_ftppred_hint">Modèle : puissance = (poids total × g × D+) / (durée × rendement), corrigée par la courbe puissance-durée (tests 8 min ×0.90, 20 min ×0.95, 60 min ×1.00…).</div>
+   </div>
+
+   <!-- ZONES PUISSANCE + VAM -->
+   <div class="chart-container" data-hide-sports="hiking,running">
+     <div class="chart-header" data-sec="sec_zones_pwr">ZONES PUISSANCE + VAM</div>
+     <div class="zones-grid" id="zones-grid"></div>
+   </div>
+
+   <!-- ZONES FRÉQUENCE CARDIAQUE -->
+   <div class="chart-container">
+     <div class="chart-header" data-sec="sec_zones_hr">ZONES FRÉQUENCE CARDIAQUE</div>
+     <div class="hr-zones" id="hr-zones"></div>
+   </div>
+
+   <!-- ZONES COURSE À PIED (running only) -->
+   <div class="chart-container" id="run-zone-panel" style="display:none">
+     <div class="chart-header" data-sec="sec_run_zones">ZONES COURSE À PIED</div>
+     <div id="run-zone-table"></div>
+   </div>
+
+   <!-- PRÉDICTEUR DE COURSE (running only) -->
+   <div class="chart-container" id="race-predictor-container" data-hide-sports="hiking,cycling" style="display:none">
+     <div class="chart-header" data-i18n="chart_race_predictor">PRÉDICTEUR DE COURSE</div>
+     <div id="race-predictor-body"></div>
+   </div>
+
+ </div><!-- end tab-zones -->
+
  <div class="empty-state" id="empty-state">
   <!-- WELCOME MESSAGE (startup — GPX info only) -->
   <div class="welcome-card" id="welcome-card" style="max-width:460px">
@@ -1176,7 +1229,7 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
     <div class="drop-icon">📂</div>
     <div class="drop-text" data-i18n="lbl_drag">Drag your .gpx file here</div>
     <div style="margin:8px 0;font-size:9px;color:var(--text2)">— ou —</div>
-    <label class="gpx-load-btn" for="gpx-input" style="cursor:pointer;display:inline-block" data-i18n="btn_gpx">⊕ GPX</label>
+    <label class="gpx-load-btn" for="gpx-input" style="cursor:pointer"><span class="btn-icon">⊕</span><span class="gpx-txt" data-i18n="btn_gpx">GPX</span></label>
   </div>
   <div style="font-size:9px;color:var(--text2);margin-top:8px">Format .gpx standard — traces GPS avec altitude</div>
  </div>
@@ -1210,15 +1263,8 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
     </div>
   </div>
 
-  <!-- ── TAB NAVIGATION ── -->
-  <div class="tab-nav" id="tab-nav">
-    <button class="tab-btn active" data-tab="profile" data-i18n="tab_profile">🗺️</button>
-    <button class="tab-btn" data-tab="physio" data-i18n="tab_physio">💓</button>
-    <button class="tab-btn" data-tab="nutrition" data-i18n="tab_nutrition">🍌</button>
-  </div>
-
   <!-- ══ TAB 1: PROFIL DE SORTIE ══ -->
-  <div id="tab-profile" class="tab-content">
+  <div id="tab-profile" class="tab-content" style="display:none">
 
     <!-- MAP TOGGLE + MAP TRACE -->
     <div id="map-toggle-bar" style="display:none;align-items:center;gap:8px;padding:5px 8px;background:var(--panel);border:1px solid var(--border2);border-bottom:none;font-family:'Inter',sans-serif;font-size:11px;color:var(--text2)">
@@ -1289,12 +1335,6 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
     <div class="chart-container" id="pace-dist-container">
       <div class="chart-header" id="pace-dist-header" data-i18n="chart_pace_dist">RÉPARTITION ALLURE PAR ZONE</div>
       <canvas id="pace-dist-canvas"></canvas>
-    </div>
-
-    <!-- RACE PREDICTOR (running only) -->
-    <div class="chart-container" id="race-predictor-container" data-hide-sports="hiking,cycling">
-      <div class="chart-header" data-i18n="chart_race_predictor">PRÉDICTEUR DE COURSE</div>
-      <div id="race-predictor-body"></div>
     </div>
 
   </div><!-- end tab-physio -->
@@ -1425,7 +1465,7 @@ let pwrModel='5z';
 let useVAM=false;
 let useFCauto=false;
 let useFTPauto=false;
-let lightTheme=false;
+let lightTheme=true;
 // Zoom state in %
 let zoomStart=0, zoomEnd=100;
 // Sport state
@@ -1460,6 +1500,102 @@ function getZoneDefs(){return pwrModel==='3z'?getZone3():getZone5();}
 // ══════════════════════════════════════════════════
 function getVal(id){return parseFloat(document.getElementById(id).value)||0;}
 function totalMass(){return getVal('weight')+getVal('bike-weight');}
+
+// ══════════════════════════════════════════════════
+// FTP PREDICTOR FROM A CLIMB (D+ & duration)
+// ══════════════════════════════════════════════════
+// Step 1 — average power required to gain that much elevation in that
+// time: P = (total mass × g × D+) / (t × drivetrain efficiency). This
+// ignores rolling/aero resistance (unknown without a distance/grade),
+// a simplification widely used by climb-based power estimators since
+// those losses are small relative to the gravity component on a climb.
+//
+// Step 2 — that average power is only "FTP" if the effort lasted ~60
+// minutes. Shorter climbs are ridden above FTP, longer ones below it.
+// FTP_DURATION_PCT below is a % of FTP typically sustainable for a
+// given duration, built from published test-protocol correction
+// factors: 2×8-min test ×0.90 and 20-min test ×0.95 (TrainerRoad /
+// Coggan & Allen), 60-min = 100% by definition, and the general shape
+// Duration correction factor, applied differently depending on whether the
+// climb is shorter or longer than ~60 min:
+//  - duration ≤ 60 min: the climb is a harder-than-FTP effort, so its
+//    average power is ABOVE FTP → FTP = average power × factor (factor ≤ 1
+//    scales the estimate DOWN).
+//  - duration > 60 min: the climb is an easier, endurance-paced effort, so
+//    its average power is BELOW FTP → FTP = average power / factor (factor
+//    ≤ 1 scales the estimate UP).
+const FTP_DURATION_PCT = [
+  [3,0.80],[5,0.85],[8,0.90],[10,0.915],[12,0.93],[15,0.94],[20,0.95],
+  [30,0.965],[40,0.98],[50,0.995],[60,1.00],[75,0.985],[90,0.97],
+  [120,0.94],[150,0.90],[180,0.85],[240,0.78]
+];
+function ftpDurationFactor(minutes){
+  const T=FTP_DURATION_PCT;
+  if(minutes<=T[0][0]) return T[0][1];
+  if(minutes>=T[T.length-1][0]) return T[T.length-1][1];
+  for(let i=0;i<T.length-1;i++){
+    const [t0,p0]=T[i],[t1,p1]=T[i+1];
+    if(minutes>=t0&&minutes<=t1){
+      const f=(minutes-t0)/(t1-t0);
+      return p0+(p1-p0)*f;
+    }
+  }
+  return 1;
+}
+function predictFTPfromClimb(dPlusM,durationMin){
+  if(!dPlusM||!durationMin||dPlusM<=0||durationMin<=0) return null;
+  const m=totalMass(),g=9.81,eta=0.976;
+  const tSec=durationMin*60;
+  const avgPower=(m*g*dPlusM)/tSec/eta;
+  const factor=ftpDurationFactor(durationMin);
+  const ftp = durationMin<=60 ? avgPower*factor : avgPower/factor;
+  return {avgPower,factor,ftp};
+}
+function updateFTPPredictor(){
+  const dplusEl=document.getElementById('ftppred-dplus');
+  const durEl=document.getElementById('ftppred-duration');
+  if(!dplusEl||!durEl) return;
+  const dplus=parseFloat(dplusEl.value);
+  const dur=parseFloat(durEl.value);
+  const res=predictFTPfromClimb(dplus,dur);
+  const avgEl=document.getElementById('ftppred-avgpower');
+  const facEl=document.getElementById('ftppred-factor');
+  const resEl=document.getElementById('ftppred-result');
+  if(!res){
+    if(avgEl)avgEl.textContent='—';
+    if(facEl)facEl.textContent='—';
+    if(resEl)resEl.textContent='—';
+    return;
+  }
+  if(avgEl)avgEl.textContent=Math.round(res.avgPower)+' W';
+  if(facEl)facEl.textContent=(res.factor*100).toFixed(1)+' %';
+  if(resEl)resEl.textContent=Math.round(res.ftp)+' W';
+}
+(function(){
+  const dplusEl=document.getElementById('ftppred-dplus');
+  const durEl=document.getElementById('ftppred-duration');
+  const applyBtn=document.getElementById('ftppred-apply-btn');
+  if(dplusEl) dplusEl.addEventListener('input',updateFTPPredictor);
+  if(durEl) durEl.addEventListener('input',updateFTPPredictor);
+  if(applyBtn) applyBtn.addEventListener('click',()=>{
+    const dplus=parseFloat(dplusEl?.value);
+    const dur=parseFloat(durEl?.value);
+    const res=predictFTPfromClimb(dplus,dur);
+    if(!res) return;
+    const ftpEl=document.getElementById('ftp');
+    if(ftpEl){
+      ftpEl.value=Math.round(res.ftp);
+      ftpEl.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+  });
+  // Recompute whenever weight/bike-weight change too (they feed totalMass())
+  ['weight','bike-weight'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input',updateFTPPredictor);
+  });
+  updateFTPPredictor();
+})();
+
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function formatTime(m){if(!m||isNaN(m))return'—';const h=Math.floor(m/60);return `${h}h${Math.round(m%60).toString().padStart(2,'0')}`;}
 function formatTOD(hh,mm,add){let t=hh*60+mm+add;t=t%(24*60);return `${Math.floor(t/60).toString().padStart(2,'0')}:${Math.round(t%60).toString().padStart(2,'0')}`;}
@@ -2006,6 +2142,13 @@ function calcRoute(){
 
  document.getElementById('empty-state').style.display='none';
  document.getElementById('chart-tabs-wrapper').style.display='';
+ // Reveal the Profile/Physio/Nutrition tabs (hidden until a route is
+ // loaded) and, the first time a GPX is loaded, jump to the route view.
+ if(!window._gpxTabsRevealed){
+   window._gpxTabsRevealed = true;
+   document.querySelectorAll('.tab-btn-gpx-only').forEach(b=>b.classList.remove('tab-btn-gpx-only'));
+   switchTab('profile');
+ }
  // Init zoom if not done yet
  if(typeof initNewZoom==='function' && gpxData) initNewZoom(gpxData.totalDist);
  // Show climb-list and climb-grade containers
@@ -2763,11 +2906,12 @@ function renderZones(){
  const zg=document.getElementById('zones-grid');zg.innerHTML='';
  defs.forEach(z=>{
  const lo=Math.round(ftp*z.pct[0]/100);
- const hi=z.pct[1]>=150?'∞':Math.round(ftp*z.pct[1]/100);
- const pMid=ftp*(z.pct[0]+Math.min(z.pct[1],149))/200;
- const vam=vamForPower(pMid,7);
+ const hiNum=z.pct[1]>=150?null:Math.round(ftp*z.pct[1]/100);
+ const hi=hiNum===null?'∞':hiNum;
+ const vamLo=vamForPower(lo,7);
+ const vamHi=hiNum===null?'∞':vamForPower(hiNum,7);
  const d=document.createElement('div');d.className='zone-row';d.style.borderLeftColor=z.color;
- d.innerHTML=`<span class="z-name" style="color:${z.color}">Z${z.z} ${z.name}</span><span class="z-range">${lo}–${hi} W</span><span class="z-vam">▲ ${vam} m/h</span>`;
+ d.innerHTML=`<span class="z-name" style="color:${z.color}">Z${z.z} ${z.name}</span><span class="z-range">${lo}–${hi} W</span><span class="z-vam">▲ ${vamLo}–${vamHi} m/h</span>`;
  zg.appendChild(d);
  });
 
@@ -3460,7 +3604,7 @@ document.getElementById('timing-scroll-right').addEventListener('click',()=>{
 // ══════════════════════════════════════════════════
 const I18N={
   en:{
-  btn_gpx:'⊕ GPX',no_file:'— NO FILE LOADED —',
+  btn_gpx:'GPX',no_file:'— NO FILE LOADED —',
   kpi_dist:'Distance',kpi_dplus:'D+',kpi_dminus:'D−',kpi_altmax:'Alt. max',
   kpi_climbs:'Climbs >50m',kpi_climbs_unit:'climbs',
   kpi_ride_time:'Effort time',kpi_total_time:'Total + stops',
@@ -3663,9 +3807,19 @@ const I18N={
   'climb_ascent_label':'ASCENT',
   'climb_start_word':'Start',
   'climb_at_word':' at ',
-  'tab_profile':'🗺️',
-  'tab_physio':'💓',
-  'tab_nutrition':'🍌',
+  'tab_profile':'Route',
+  'tab_physio':'Effort',
+  'tab_nutrition':'Fuel',
+  'tab_zones':'Zones',
+  'chart_ftp_predictor':'FTP PREDICTOR (FROM A CLIMB)',
+  'lbl_ftppred_dplus':'Elevation gain',
+  'lbl_ftppred_duration':'Climb duration',
+  'lbl_ftppred_avgpower':'Estimated average power',
+  'lbl_ftppred_factor':'Duration correction factor',
+  'lbl_ftppred_result':'Estimated FTP (~60 min)',
+  'btn_ftppred_apply':'✓ USE THIS FTP',
+  'lbl_ftppred_hint':'Model: power = (total weight × g × elevation gain) / (duration × drivetrain efficiency), corrected using the power-duration curve (8-min test ×0.90, 20-min ×0.95, 60-min ×1.00…).',
+  'unit_min':'min',
   'zoom_scale':'Scale',
   'zoom_window':'Window',
   'pwr_z1':'Recovery',
@@ -3695,7 +3849,7 @@ const I18N={
   'rb_time':'TIME','rb_grade':'GRADE','rb_power':'POWER','rb_zone':'ZONE','rb_cumul':'CUMUL. TIME','rb_nutrition':'NUTRITION 🍌'
   },
   fr:{
-  btn_gpx:'⊕ GPX',no_file:'— AUCUN FICHIER CHARGÉ —',
+  btn_gpx:'GPX',no_file:'— AUCUN FICHIER CHARGÉ —',
   kpi_dist:'Distance',kpi_dplus:'D+',kpi_dminus:'D−',kpi_altmax:'Alt. max',
   kpi_climbs:'Montées >50m',kpi_climbs_unit:'bosses D+',
   kpi_ride_time:'Durée effort',kpi_total_time:'Durée + pauses',
@@ -3898,9 +4052,19 @@ const I18N={
   'climb_ascent_label':'ASCENSION',
   'climb_start_word':'Départ',
   'climb_at_word':' à ',
-  'tab_profile':'🗺️',
-  'tab_physio':'💓',
-  'tab_nutrition':'🍌',
+  'tab_profile':'Parcours',
+  'tab_physio':'Effort',
+  'tab_nutrition':'Ravito',
+  'tab_zones':'Mes zones',
+  'chart_ftp_predictor':'PRÉDICTEUR DE FTP (À PARTIR D\'UNE ASCENSION)',
+  'lbl_ftppred_dplus':'Dénivelé D+',
+  'lbl_ftppred_duration':'Durée de l\'ascension',
+  'lbl_ftppred_avgpower':'Puissance moyenne estimée',
+  'lbl_ftppred_factor':'Facteur correctif (durée)',
+  'lbl_ftppred_result':'FTP estimée (~60 min)',
+  'btn_ftppred_apply':'✓ UTILISER CETTE FTP',
+  'lbl_ftppred_hint':'Modèle : puissance = (poids total × g × D+) / (durée × rendement), corrigée par la courbe puissance-durée (tests 8 min ×0.90, 20 min ×0.95, 60 min ×1.00…).',
+  'unit_min':'min',
   'zoom_scale':'Échelle',
   'zoom_window':'Fenêtre',
   'pwr_z1':'Récup.',
@@ -3930,7 +4094,7 @@ const I18N={
   'rb_time':'TEMPS','rb_grade':'PENTE','rb_power':'PUISSANCE','rb_zone':'ZONE','rb_cumul':'TEMPS CUM.','rb_nutrition':'NUTRITION 🍌'
   },
   de:{
-  btn_gpx:'⊕ GPX',no_file:'— KEINE DATEI GELADEN —',
+  btn_gpx:'GPX',no_file:'— KEINE DATEI GELADEN —',
   kpi_dist:'Distanz',kpi_dplus:'D+',kpi_dminus:'D−',kpi_altmax:'Max. Höhe',
   kpi_climbs:'Anstiege >50m',kpi_climbs_unit:'Anstiege',
   kpi_ride_time:'Anstrengungszeit',kpi_total_time:'Zeit + Pausen',
@@ -4133,9 +4297,19 @@ const I18N={
   'climb_ascent_label':'ANSTIEG',
   'climb_start_word':'Start',
   'climb_at_word':' bei ',
-  'tab_profile':'🗺️',
-  'tab_physio':'💓',
-  'tab_nutrition':'🍌',
+  'tab_profile':'Strecke',
+  'tab_physio':'Belastung',
+  'tab_nutrition':'Verpflegung',
+  'tab_zones':'Zonen',
+  'chart_ftp_predictor':'FTP-PROGNOSE (AUS EINEM ANSTIEG)',
+  'lbl_ftppred_dplus':'Höhenmeter',
+  'lbl_ftppred_duration':'Anstiegsdauer',
+  'lbl_ftppred_avgpower':'Geschätzte Durchschnittsleistung',
+  'lbl_ftppred_factor':'Korrekturfaktor (Dauer)',
+  'lbl_ftppred_result':'Geschätzte FTP (~60 Min)',
+  'btn_ftppred_apply':'✓ DIESE FTP VERWENDEN',
+  'lbl_ftppred_hint':'Modell: Leistung = (Gesamtgewicht × g × Höhenmeter) / (Dauer × Antriebseffizienz), korrigiert anhand der Leistungs-Dauer-Kurve (8-Min-Test ×0,90, 20-Min ×0,95, 60-Min ×1,00…).',
+  'unit_min':'Min',
   'zoom_scale':'Maßstab',
   'zoom_window':'Fenster',
   'pwr_z1':'Erholung',
@@ -4165,7 +4339,7 @@ const I18N={
   'rb_time':'ZEIT','rb_grade':'STEIGUNG','rb_power':'LEISTUNG','rb_zone':'ZONE','rb_cumul':'KUM. ZEIT','rb_nutrition':'ERNÄHRUNG 🍌'
   },
   es:{
-  btn_gpx:'⊕ GPX',no_file:'— NINGÚN ARCHIVO CARGADO —',
+  btn_gpx:'GPX',no_file:'— NINGÚN ARCHIVO CARGADO —',
   kpi_dist:'Distancia',kpi_dplus:'D+',kpi_dminus:'D−',kpi_altmax:'Alt. máx',
   kpi_climbs:'Subidas >50m',kpi_climbs_unit:'subidas',
   kpi_ride_time:'Tiempo esfuerzo',kpi_total_time:'Tiempo + paradas',
@@ -4354,7 +4528,7 @@ const I18N={
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
   'climb_col_grade':'Pend. media',
-  'climb_col_km_start':'Km inicio','climb_col_km_end':'Km fin','climb_col_alt_start':'Alt. inicio','climb_col_alt_end':'Alt. fin','chart_climb_grade':'PENDIENTE — ASCENSO','climb_legend_title':'LEYENDA','climb_legend_0':'De 0 a 2,9%','climb_legend_3':'De 3 a 5,9%','climb_legend_6':'De 6 a 8,9%','climb_legend_9':'A partir de 9%','climb_pct_label':'% medio por km','climb_pct_label_100m':'% medio por 100m','climb_ascent_label':'ASCENSO','climb_start_word':'Inicio','climb_at_word':' a ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Escala','zoom_window':'Ventana',
+  'climb_col_km_start':'Km inicio','climb_col_km_end':'Km fin','climb_col_alt_start':'Alt. inicio','climb_col_alt_end':'Alt. fin','chart_climb_grade':'PENDIENTE — ASCENSO','climb_legend_title':'LEYENDA','climb_legend_0':'De 0 a 2,9%','climb_legend_3':'De 3 a 5,9%','climb_legend_6':'De 6 a 8,9%','climb_legend_9':'A partir de 9%','climb_pct_label':'% medio por km','climb_pct_label_100m':'% medio por 100m','climb_ascent_label':'ASCENSO','climb_start_word':'Inicio','climb_at_word':' a ','tab_profile':'Ruta','tab_physio':'Esfuerzo','tab_nutrition':'Nutrición','tab_zones':'Zonas','chart_ftp_predictor':'PREDICTOR DE FTP (DESDE UNA SUBIDA)','lbl_ftppred_dplus':'Desnivel positivo','lbl_ftppred_duration':'Duración de la subida','lbl_ftppred_avgpower':'Potencia media estimada','lbl_ftppred_factor':'Factor de corrección (duración)','lbl_ftppred_result':'FTP estimada (~60 min)','btn_ftppred_apply':'✓ USAR ESTA FTP','lbl_ftppred_hint':'Modelo: potencia = (peso total × g × desnivel) / (duración × eficiencia de transmisión), corregida con la curva potencia-duración (test 8 min ×0,90, 20 min ×0,95, 60 min ×1,00…).','unit_min':'min','zoom_scale':'Escala','zoom_window':'Ventana',
   'pwr_z1':'Recuperación',
   'pwr_z2':'Resistencia',
   'pwr_z3':'Tempo',
@@ -4382,7 +4556,7 @@ const I18N={
   'rb_time':'TIEMPO','rb_grade':'PENDIENTE','rb_power':'POTENCIA','rb_zone':'ZONA','rb_cumul':'TIEMPO AC.','rb_nutrition':'NUTRICIÓN 🍌'
   },
   it:{
-  btn_gpx:'⊕ GPX',no_file:'— NESSUN FILE CARICATO —',
+  btn_gpx:'GPX',no_file:'— NESSUN FILE CARICATO —',
   kpi_dist:'Distanza',kpi_dplus:'D+',kpi_dminus:'D−',kpi_altmax:'Alt. max',
   kpi_climbs:'Salite >50m',kpi_climbs_unit:'salite',
   kpi_ride_time:'Tempo sforzo',kpi_total_time:'Tempo + soste',
@@ -4571,7 +4745,7 @@ const I18N={
   'climb_col_dplus':'D+',
   'climb_col_dist':'Dist.',
   'climb_col_grade':'Pend. media',
-  'climb_col_km_start':'Km inizio','climb_col_km_end':'Km fine','climb_col_alt_start':'Alt. inizio','climb_col_alt_end':'Alt. fine','chart_climb_grade':'PENDENZA — SALITA','climb_legend_title':'LEGENDA','climb_legend_0':'Da 0 a 2,9%','climb_legend_3':'Da 3 a 5,9%','climb_legend_6':'Da 6 a 8,9%','climb_legend_9':'Dal 9%','climb_pct_label':'% media per km','climb_pct_label_100m':'% media per 100m','climb_ascent_label':'SALITA','climb_start_word':'Partenza','climb_at_word':' a ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Scala','zoom_window':'Finestra',
+  'climb_col_km_start':'Km inizio','climb_col_km_end':'Km fine','climb_col_alt_start':'Alt. inizio','climb_col_alt_end':'Alt. fine','chart_climb_grade':'PENDENZA — SALITA','climb_legend_title':'LEGENDA','climb_legend_0':'Da 0 a 2,9%','climb_legend_3':'Da 3 a 5,9%','climb_legend_6':'Da 6 a 8,9%','climb_legend_9':'Dal 9%','climb_pct_label':'% media per km','climb_pct_label_100m':'% media per 100m','climb_ascent_label':'SALITA','climb_start_word':'Partenza','climb_at_word':' a ','tab_profile':'Percorso','tab_physio':'Sforzo','tab_nutrition':'Rifornimento','tab_zones':'Zone','chart_ftp_predictor':'PREDITTORE FTP (DA UNA SALITA)','lbl_ftppred_dplus':'Dislivello positivo','lbl_ftppred_duration':'Durata della salita','lbl_ftppred_avgpower':'Potenza media stimata','lbl_ftppred_factor':'Fattore correttivo (durata)','lbl_ftppred_result':'FTP stimata (~60 min)','btn_ftppred_apply':'✓ USA QUESTA FTP','lbl_ftppred_hint':'Modello: potenza = (peso totale × g × dislivello) / (durata × efficienza trasmissione), corretta con la curva potenza-durata (test 8 min ×0,90, 20 min ×0,95, 60 min ×1,00…).','unit_min':'min','zoom_scale':'Scala','zoom_window':'Finestra',
   'pwr_z1':'Recupero',
   'pwr_z2':'Resistenza',
   'pwr_z3':'Tempo',
@@ -4599,7 +4773,7 @@ const I18N={
   'rb_time':'TEMPO','rb_grade':'PENDENZA','rb_power':'POTENZA','rb_zone':'ZONA','rb_cumul':'TEMPO CUM.','rb_nutrition':'NUTRIZIONE 🍌'
   },
   nl:{
-  btn_gpx:'⊕ GPX',no_file:'— GEEN BESTAND GELADEN —',
+  btn_gpx:'GPX',no_file:'— GEEN BESTAND GELADEN —',
   kpi_dist:'Afstand',kpi_dplus:'D+',kpi_dminus:'D−',kpi_altmax:'Max. hoogte',
   kpi_climbs:'Klimmen >50m',kpi_climbs_unit:'klimmen',
   kpi_ride_time:'Inspanningstijd',kpi_total_time:'Tijd + pauzes',
@@ -4788,7 +4962,7 @@ const I18N={
   'climb_col_dplus':'D+',
   'climb_col_dist':'Afst.',
   'climb_col_grade':'Gem. helling',
-  'climb_col_km_start':'Start km','climb_col_km_end':'Eind km','climb_col_alt_start':'Start hoogte','climb_col_alt_end':'Eind hoogte','chart_climb_grade':'STIJGING PER 100m','climb_legend_title':'LEGENDA','climb_legend_0':'0 tot 2,9%','climb_legend_3':'3 tot 5,9%','climb_legend_6':'6 tot 8,9%','climb_legend_9':'Vanaf 9%','climb_pct_label':'Gem. % per km','climb_pct_label_100m':'Gem. % per 100m','climb_ascent_label':'BEKLIMMING','climb_start_word':'Start','climb_at_word':' bij ','tab_profile':'🗺️','tab_physio':'💓','tab_nutrition':'🍌','zoom_scale':'Schaal','zoom_window':'Venster',
+  'climb_col_km_start':'Start km','climb_col_km_end':'Eind km','climb_col_alt_start':'Start hoogte','climb_col_alt_end':'Eind hoogte','chart_climb_grade':'STIJGING PER 100m','climb_legend_title':'LEGENDA','climb_legend_0':'0 tot 2,9%','climb_legend_3':'3 tot 5,9%','climb_legend_6':'6 tot 8,9%','climb_legend_9':'Vanaf 9%','climb_pct_label':'Gem. % per km','climb_pct_label_100m':'Gem. % per 100m','climb_ascent_label':'BEKLIMMING','climb_start_word':'Start','climb_at_word':' bij ','tab_profile':'Route','tab_physio':'Inspanning','tab_nutrition':'Voeding','tab_zones':'Zones','chart_ftp_predictor':'FTP-VOORSPELLER (VANUIT EEN BEKLIMMING)','lbl_ftppred_dplus':'Hoogtemeters','lbl_ftppred_duration':'Duur van de beklimming','lbl_ftppred_avgpower':'Geschat gemiddeld vermogen','lbl_ftppred_factor':'Correctiefactor (duur)','lbl_ftppred_result':'Geschatte FTP (~60 min)','btn_ftppred_apply':'✓ GEBRUIK DEZE FTP','lbl_ftppred_hint':'Model: vermogen = (totaalgewicht × g × hoogtemeters) / (duur × aandrijfrendement), gecorrigeerd met de vermogen-duur-curve (8-min test ×0,90, 20-min ×0,95, 60-min ×1,00…).','unit_min':'min','zoom_scale':'Schaal','zoom_window':'Venster',
   'pwr_z1':'Herstel',
   'pwr_z2':'Duurvermogen',
   'pwr_z3':'Tempo',
@@ -7373,7 +7547,7 @@ function _drawClimbGradeChart(cv, segs, climb, idx) {
 // ══════════════════════════════════════════════════
 // TAB SWITCHING
 // ══════════════════════════════════════════════════
-let activeTab = 'profile';
+let activeTab = 'zones';
 
 function switchTab(tabName) {
   activeTab = tabName;
@@ -7385,6 +7559,11 @@ function switchTab(tabName) {
   });
   const panel = document.getElementById('tab-' + tabName);
   if (panel) panel.style.display = '';
+  // Zoom control only affects the route/profile charts (map, elevation,
+  // timing, climbs) — it has no effect on the nutrition or effort (physio)
+  // tabs, so hide it there to avoid a misleading control.
+  const zoomContainer = document.getElementById('zoom-container');
+  if (zoomContainer) zoomContainer.style.display = (tabName === 'nutrition' || tabName === 'physio') ? 'none' : '';
   if (segCalcCache) requestAnimationFrame(() => drawAllCharts(segCalcCache));
 }
 
