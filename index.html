@@ -561,7 +561,7 @@ body:not(.light) .slider-val{color:#94a3b8}
 body:not(.light) .pb-val{color:#8b5cf6}
 body:not(.light) input[type=number]:focus,body:not(.light) select:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,0.2)}
 body:not(.light) .model-tab:hover{border-color:#475569;color:#cbd5e1}
-body:not(.light) .zone-btn:hover,.zone-btn.active{color:#fff}
+body:not(.light) .zone-btn:hover,body:not(.light) .zone-btn.active{color:#fff}
 body:not(.light) #zoom-range-lbl{color:#3b82f6}
 body:not(.light) .input-row input[type=number]{color:#e2e8f0}
 body:not(.light) .input-row select{color:#e2e8f0}
@@ -589,7 +589,7 @@ body:not(.light) .input-row select{color:#e2e8f0}
 /* Save button */
 .save-btn{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:4px 8px;font-size:15px;cursor:pointer;border-radius:2px;transition:all .2s;line-height:1;position:relative}
 .save-btn:hover{border-color:var(--accent2);color:var(--accent2);box-shadow:0 0 8px rgba(34,211,238,.2)}
-.save-btn.saved{border-color:#4ae870;color:#4ae870}
+.save-btn.saved{border-color:#1c8a45;color:#1c8a45}
 .save-btn .save-tooltip{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:8px;font-family:'JetBrains Mono',monospace;background:var(--panel2);border:1px solid var(--border);padding:2px 5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s;border-radius:2px}
 .save-btn:hover .save-tooltip{opacity:1}
 
@@ -840,7 +840,7 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
  <div style="display:flex;align-items:baseline;gap:6px">
  <img src="data:image/png;base64,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" alt="StrideMetric" style="height:40px;width:auto;display:block;object-fit:contain;image-rendering:auto">
  </div>
- <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text2);letter-spacing:1px;align-self:flex-start;margin-top:1px">v3.34</span>
+ <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text2);letter-spacing:1px;align-self:flex-start;margin-top:1px">v3.35</span>
  </div>
  <div class="route-name" id="route-name">— AUCUN FICHIER CHARGÉ —</div>
  <div class="header-controls">
@@ -914,8 +914,8 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
  <!-- Z5 ROUGE — ÉNERGIE/NUTRITION -->
  <div class="kpi-group kpi-group-red">
  <div class="kpi" data-i18n-label="kpi_energy"><div class="kpi-label" data-i18n="kpi_energy">Énergie dépensée</div><div class="kpi-value" id="kpi-energy">—</div><div class="kpi-unit">kcal</div></div>
- <div class="kpi" data-i18n-label="kpi_carbs"><div class="kpi-label" data-i18n="kpi_carbs">Glucides</div><div class="kpi-value" id="kpi-carbs">—</div><div class="kpi-unit">g total</div></div>
- <div class="kpi kpi-last" data-i18n-label="kpi_carbkcal"><div class="kpi-label" data-i18n="kpi_carbkcal">Apport gluc.</div><div class="kpi-value" id="kpi-carbkcal">—</div><div class="kpi-unit">kcal</div></div>
+ <div class="kpi" data-i18n-label="kpi_carbneed"><div class="kpi-label" data-i18n="kpi_carbneed">Besoin glucides</div><div class="kpi-value" id="kpi-carbneed">—</div><div class="kpi-unit">g total</div></div>
+ <div class="kpi kpi-last" data-i18n-label="kpi_waterneed"><div class="kpi-label" data-i18n="kpi_waterneed">Besoin en eau</div><div class="kpi-value" id="kpi-waterneed">—</div><div class="kpi-unit">L total</div></div>
   </div>
  <!-- RUNNING — Pace (separate group, shown only in running mode) -->
  <div class="kpi-group kpi-group-running kpi-group-green">
@@ -938,7 +938,7 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
  <div class="panel-block">
  <div class="section-title" data-sec="sec_profile">Profil Cycliste</div>
  <div class="input-row"><label data-i18n="lbl_weight">Poids corps</label><input type="number" id="weight" value="57" min="35" max="150" step="0.5"><span class="unit">kg</span></div>
- <div class="input-row"><label data-i18n="lbl_bike">Vélo + équip.</label><input type="number" id="bike-weight" value="10" min="3" max="30" step="0.1"><span class="unit">kg</span></div>
+ <div class="input-row"><label data-i18n="lbl_bike">Poids équipement</label><input type="number" id="bike-weight" value="10" min="3" max="30" step="0.1"><span class="unit">kg</span></div>
  <div class="input-row"><label data-i18n="lbl_age">Âge</label><input type="number" id="age" value="40" min="15" max="80" step="1"><span class="unit">ans</span></div>
  <div class="input-row">
  <label data-i18n="lbl_sex">Sexe</label>
@@ -1259,7 +1259,7 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
     <label class="gpx-load-btn" for="gpx-input" style="cursor:pointer"><span class="btn-icon">⊕</span><span class="gpx-txt" data-i18n="btn_gpx">GPX</span></label>
   </div>
   <div style="font-size:9px;color:var(--text2);margin-top:8px" data-i18n="lbl_gpx_format">Format .gpx standard — traces GPS avec altitude</div>
-  <div style="font-size:10px;margin-top:14px">
+  <div style="font-size:13px;font-weight:600;margin-top:14px">
     <a href="https://buymeacoffee.com/stridemetric" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">
       <span data-i18n="msg_support_dropzone">Aidez moi à financer un Bidon d'Isotonique ou un Gel Énergétique 😅</span>
     </a>
@@ -1441,6 +1441,24 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
         <img src="data:image/png;base64,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" alt="Buy me a coffee" width="150" height="42" style="display:inline-block;border-radius:8px">
       </a>
     </div>
+
+    <!-- SCIENTIFIC REFERENCES -->
+    <div id="hm-refs-title" style="font-weight:700;font-size:11px;color:var(--accent);margin:18px 0 6px;letter-spacing:1.5px;text-transform:uppercase;border-top:1px solid var(--border2);padding-top:14px">🔬 Références scientifiques</div>
+    <div id="hm-refs-intro" style="font-size:10px;color:var(--text2);margin-bottom:8px">Formules et modèles physiologiques/biomécaniques utilisés pour calculer les indicateurs (KPI) de cette application :</div>
+    <ol style="font-size:9px;color:var(--text2);line-height:1.7;padding-left:16px;margin:0;font-family:'JetBrains Mono',monospace">
+      <li>Martin, J.C., Milliken, D.L., Cobb, J.E., McFadden, K.L., &amp; Coggan, A.R. (1998). Validation of a mathematical model for road cycling power. <em>Journal of Applied Biomechanics</em>, 14(3), 276–291.<br><span style="color:var(--text3)" id="hm-ref1-d">→ modèle de puissance vélo (gravité, aérodynamique, résistance au roulement)</span></li>
+      <li style="margin-top:6px">Minetti, A.E., Moia, C., Roi, G.S., Susta, D., &amp; Ferretti, G. (2002). Energy cost of walking and running at extreme uphill and downhill slopes. <em>Journal of Applied Physiology</em>, 93(3), 1039–1046.<br><span style="color:var(--text3)" id="hm-ref2-d">→ modèle de coût énergétique course à pied en pente</span></li>
+      <li style="margin-top:6px">Pandolf, K.B., Givoni, B., &amp; Goldman, R.F. (1977). Predicting energy expenditure with loads while standing or walking very slowly. <em>Journal of Applied Physiology</em>, 43(4), 577–581.<br><span style="color:var(--text3)" id="hm-ref3-d">→ modèle randonnée / marche avec charge portée</span></li>
+      <li style="margin-top:6px">Tanaka, H., Monahan, K.D., &amp; Seals, D.R. (2001). Age-predicted maximal heart rate revisited. <em>Journal of the American College of Cardiology</em>, 37(1), 153–156.<br><span style="color:var(--text3)" id="hm-ref4-d">→ FC max estimée (hommes)</span></li>
+      <li style="margin-top:6px">Gulati, M., Shaw, L.J., Thisted, R.A., Black, H.R., Bairey Merz, C.N., &amp; Arnsdorf, M.F. (2010). Heart rate response to exercise stress testing in asymptomatic women. <em>Circulation</em>, 122(2), 130–137.<br><span style="color:var(--text3)" id="hm-ref5-d">→ FC max estimée (femmes)</span></li>
+      <li style="margin-top:6px">Karvonen, M.J., Kentala, E., &amp; Mustala, O. (1957). The effects of training on heart rate: a longitudinal study. <em>Annales Medicinae Experimentalis et Biologiae Fenniae</em>, 35(3), 307–315.<br><span style="color:var(--text3)" id="hm-ref6-d">→ zones de fréquence cardiaque (méthode de la réserve cardiaque)</span></li>
+      <li style="margin-top:6px">Coggan, A.R., &amp; Allen, H. (2010). <em>Training and Racing with a Power Meter</em> (2nd ed.). VeloPress.<br><span style="color:var(--text3)" id="hm-ref7-d">→ zones de puissance FTP et seuils de tenue d'effort</span></li>
+      <li style="margin-top:6px">Riegel, P.S. (1981). Athletic records and human endurance. <em>American Scientist</em>, 69(3), 285–290.<br><span style="color:var(--text3)" id="hm-ref8-d">→ prédicteur de temps de course</span></li>
+      <li style="margin-top:6px">Jeukendrup, A.E. (2014). A step towards personalized sports nutrition: carbohydrate intake during exercise. <em>Sports Medicine</em>, 44(Suppl 1), 25–33.<br><span style="color:var(--text3)" id="hm-ref9-d">→ apports glucidiques recommandés par zone d'intensité</span></li>
+      <li style="margin-top:6px">Sawka, M.N., Burke, L.M., Eichner, E.R., Maughan, R.J., Montain, S.J., &amp; Stachenfeld, N.S. (2007). American College of Sports Medicine position stand: exercise and fluid replacement. <em>Medicine &amp; Science in Sports &amp; Exercise</em>, 39(2), 377–390.<br><span style="color:var(--text3)" id="hm-ref10-d">→ besoins hydriques selon sexe, température et durée</span></li>
+      <li style="margin-top:6px">American College of Sports Medicine. (2018). <em>ACSM's Guidelines for Exercise Testing and Prescription</em> (10th ed.). Wolters Kluwer.<br><span style="color:var(--text3)" id="hm-ref11-d">→ équations métaboliques standard (VO2, VMA)</span></li>
+    </ol>
+    <div id="hm-refs-note" style="font-size:8px;color:var(--text2);margin-top:8px;font-style:italic">Note : les repères "g/kg/h" et "ml/kg/h" sont des valeurs pratiques usuelles de nutrition/hydratation sportive, à ajuster selon la tolérance individuelle. Ils ne remplacent pas l'avis d'un professionnel de santé.</div>
   </div>
 </div>
 
@@ -1514,6 +1532,16 @@ body:not(.light) .tab-btn.active{background:rgba(59,130,246,0.06)}
 let gpxData=null;
 let segCalcCache=null; // cached segment calculations
 let selectedZone=3;
+
+// Zone colors used as fills/dots/borders are kept vibrant (z2 light green,
+// z3 yellow), but those same hex values are too low-contrast when used as
+// plain TEXT on the app's light/dark panel backgrounds. This maps a bright
+// swatch color to a darker, readable variant for text-only usages.
+const ZONE_TEXT_COLOR_OVERRIDE = {
+  '#4ae870': '#1c8a45', // z2 light green → darker green (readable on light & dark bg)
+  '#ffd700': '#a8790b', // z3 yellow      → darker amber (readable on light & dark bg)
+};
+function zoneTextColor(c){ return ZONE_TEXT_COLOR_OVERRIDE[c] || c; }
 let optResult={vFlat:30,vClimb:12,vamClimb:800};
 let optMode='zone';
 let hrModel='lthr';
@@ -2103,8 +2131,12 @@ function calcRoute(){
  document.getElementById('kpi-spd-flat').textContent=avgSpdFlat.toFixed(1);
  document.getElementById('kpi-spd-climb').textContent=avgSpdClimb.toFixed(1);
  document.getElementById('kpi-altmax').textContent=Math.round(gpxData.altMax);
- document.getElementById('kpi-carbs').textContent=totalCarbs;
- document.getElementById('kpi-carbkcal').textContent=carbKcal;
+ document.getElementById('kpi-carbneed').textContent=totalCarbs;
+ const _waterKpiEl=document.getElementById('kpi-waterneed');
+ if(_waterKpiEl && typeof computeHydration==='function'){
+   const _hydraTot=computeHydration(totTwithPause);
+   _waterKpiEl.textContent=_hydraTot.totalL;
+ }
 
  // Avg HR (estimated from zone distribution weighted by time)
  // ── FC moyenne avec délai d'adaptation cardiaque (3 min) ──
@@ -2190,7 +2222,7 @@ function calcRoute(){
 
  const avgZ=getZone(avgP);
  document.getElementById('czi-zone').textContent=`Z${avgZ.z}`;
- document.getElementById('czi-zone').style.color=avgZ.color;
+ document.getElementById('czi-zone').style.color=zoneTextColor(avgZ.color);
  document.getElementById('czi-desc').textContent=avgZ.name;
  const hrZ=hrForZone(avgZ);
  document.getElementById('czi-hr').textContent=`${hrZ.lo}–${hrZ.hi} bpm`;
@@ -2838,7 +2870,7 @@ function drawPowerChart(segs){
  ctx.strokeStyle='#ffd70066';ctx.lineWidth=1;ctx.setLineDash([4,4]);
  ctx.beginPath();ctx.moveTo(PAD.l,yp(ftp));ctx.lineTo(W-PAD.r,yp(ftp));ctx.stroke();
  ctx.setLineDash([]);
- ctx.fillStyle='#ffd700';ctx.font='9px Share Tech Mono';ctx.textAlign='left';
+ ctx.fillStyle='#a8790b';ctx.font='9px Share Tech Mono';ctx.textAlign='left';
  ctx.fillText('FTP '+ftp+'W',PAD.l+2,yp(ftp)-2);
  [0.5,1,1.5].forEach(f=>{
  const y=yp(ftp*f);if(y<PAD.t||y>H-PAD.b)return;
@@ -2968,7 +3000,7 @@ function renderZones(){
  const vamLo=vamForPower(lo,7);
  const vamHi=hiNum===null?'∞':vamForPower(hiNum,7);
  const d=document.createElement('div');d.className='zone-row';d.style.borderLeftColor=z.color;
- d.innerHTML=`<span class="z-name" style="color:${z.color}">Z${z.z} ${z.name}</span><span class="z-range">${lo}–${hi} W</span><span class="z-vam">▲ ${vamLo}–${vamHi} m/h</span>`;
+ d.innerHTML=`<span class="z-name" style="color:${zoneTextColor(z.color)}">Z${z.z} ${z.name}</span><span class="z-range">${lo}–${hi} W</span><span class="z-vam">▲ ${vamLo}–${vamHi} m/h</span>`;
  zg.appendChild(d);
  });
 
@@ -2977,7 +3009,7 @@ function renderZones(){
  defs.forEach(z=>{
  const hr=hrForZone(z);
  const d=document.createElement('div');d.className='hr-zone-row';d.style.borderLeftColor=z.color;
- d.innerHTML=`<span class="hz-name" style="color:${z.color}">Z${z.z} ${z.name}</span><span class="hz-range">${hr.lo}–${hr.hi} bpm</span><span class="hz-pct">${z.hrPct[0]}–${z.hrPct[1]}%</span>`;
+ d.innerHTML=`<span class="hz-name" style="color:${zoneTextColor(z.color)}">Z${z.z} ${z.name}</span><span class="hz-range">${hr.lo}–${hr.hi} bpm</span><span class="hz-pct">${z.hrPct[0]}–${z.hrPct[1]}%</span>`;
  hrz.appendChild(d);
  });
 }
@@ -3403,7 +3435,10 @@ Object.keys(SLIDERS).forEach(id=>{
 });
 ['weight','bike-weight','age','sex','hr-rest','hr-max','hr-rest2','ftp','carb-rate','carb-dose','nb-pauses','pause-dur'].forEach(id=>{
  const el=document.getElementById(id);if(!el)return;
- el.addEventListener('input',()=>{updateFCauto();updateFTPauto();updatePauseTotal();renderZones();calcRoute();updateProfileKPIs();});
+ el.addEventListener('input',()=>{
+  if(id==='bike-weight' && typeof equipWeightBySport!=='undefined') equipWeightBySport[currentSport]=parseFloat(el.value)||0;
+  updateFCauto();updateFTPauto();updatePauseTotal();renderZones();calcRoute();updateProfileKPIs();
+ });
 });
 document.getElementById('start-time').addEventListener('change',()=>calcRoute());
 
@@ -3669,12 +3704,12 @@ const I18N={
   kpi_hr_avg:'Avg HR',kpi_vam:'Climb rate',
   kpi_spd_flat:'Flat speed',kpi_spd_climb:'Climb speed',kpi_spd_avg:'Avg speed',
   kpi_pace_avg:'Avg pace',kpi_pace_flat:'Flat pace',kpi_pace_climb:'Climb pace',kpi_vma:'Est. VMA',kpi_vo2max:'Est. VO2max',
-  kpi_energy:'Energy spent',kpi_carbs:'Carbs',kpi_carbkcal:'Carb intake',
+  kpi_energy:'Energy spent',kpi_carbneed:'Carb need',kpi_waterneed:'Water need',
   sec_profile:'Rider Profile',sec_hr:'Heart Rate',sec_ftp:'FTP Power',
   sec_speed:'Speed / Pace',sec_power:'Calculated Power',sec_zones_pwr:'Power Zones + VAM',
   sec_zones_hr:'Heart Rate Zones',sec_nutrition:'Nutrition',sec_pauses:'Stops',
   sec_optimizer:'Optimizer',
-  lbl_weight:'Body weight',lbl_bike:'Bike + gear',lbl_age:'Age',
+  lbl_weight:'Body weight',lbl_bike:'Equipment weight',lbl_age:'Age',
   lbl_sex:'Gender',lbl_sex_m:'Male',lbl_sex_f:'Female',
   lbl_noise:'D+ filter (min. per phase)',
   lbl_noise_hint:'Increase to reduce D+ on flat terrain with GPS noise.',
@@ -3747,6 +3782,20 @@ const I18N={
   wc_a5_t:'🏁 Race predictor',wc_a5_d:'Estimated times for 5K, 10K, half and full marathon based on your threshold pace.',
   wc_a6_t:'⚠️ Physiological alerts',wc_a6_d:'StrideMetric warns you when an effort duration exceeds what is sustainable for the chosen zone.',
   wc_contact:'A suggestion or a bug to report? Write to us:',
+  wc_refs_title:'🔬 Scientific references',
+  wc_refs_intro:'Physiological/biomechanical formulas and models used to calculate this app\'s KPIs:',
+  wc_refs_note:'Note: the "g/kg/h" and "ml/kg/h" benchmarks are common practical sports nutrition/hydration values, to be adjusted to individual tolerance. They do not replace advice from a healthcare professional.',
+  wc_ref1_d:'→ cycling power model (gravity, aerodynamics, rolling resistance)',
+  wc_ref2_d:'→ running energy-cost model on slopes',
+  wc_ref3_d:'→ hiking / load-carriage walking model',
+  wc_ref4_d:'→ estimated max HR (men)',
+  wc_ref5_d:'→ estimated max HR (women)',
+  wc_ref6_d:'→ heart rate zones (heart rate reserve method)',
+  wc_ref7_d:'→ FTP power zones and effort-sustainability thresholds',
+  wc_ref8_d:'→ race time predictor',
+  wc_ref9_d:'→ recommended carb intake per intensity zone',
+  wc_ref10_d:'→ fluid needs by sex, temperature and duration',
+  wc_ref11_d:'→ standard metabolic equations (VO2, VMA)',
   lbl_gpx_format:'Standard .gpx format — GPS tracks with elevation',
   msg_support_dropzone:'Help me fund an energy gel or a bottle of isotonic drink 😅',
   msg_support_nutrition:'Did you know? StrideMetric burns energy too, crunching your routes! ⚡ Buy the developer a banana or a coffee'
@@ -3926,12 +3975,12 @@ const I18N={
   kpi_hr_avg:'FC moyenne',kpi_vam:'VAM réelle',
   kpi_spd_flat:'V moy. plat',kpi_spd_climb:'V moy. mont.',kpi_spd_avg:'V moy. totale',
   kpi_pace_avg:'Allure moy.',kpi_pace_flat:'Allure plat',kpi_pace_climb:'Allure montée',kpi_vma:'VMA est.',kpi_vo2max:'VO2max est.',
-  kpi_energy:'Énergie dépensée',kpi_carbs:'Glucides',kpi_carbkcal:'Apport gluc.',
+  kpi_energy:'Énergie dépensée',kpi_carbneed:'Besoin glucides',kpi_waterneed:'Besoin en eau',
   sec_profile:'Profil Cycliste',sec_hr:'Fréquence Cardiaque',sec_ftp:'Puissance FTP',
   sec_speed:'Vitesses / Allure',sec_power:'Puissance Calculée',sec_zones_pwr:'Zones Puissance + VAM',
   sec_zones_hr:'Zones Fréquence Cardiaque',sec_nutrition:'Nutrition',sec_pauses:'Pauses',
   sec_optimizer:'Optimiseur',
-  lbl_weight:'Poids corps',lbl_bike:'Vélo + équip.',lbl_age:'Âge',
+  lbl_weight:'Poids corps',lbl_bike:'Poids équipement',lbl_age:'Âge',
   lbl_sex:'Sexe',lbl_sex_m:'Homme',lbl_sex_f:'Femme',
   lbl_noise:'Filtre D+ (min. par phase)',
   lbl_noise_hint:'Augmenter pour réduire le D+ sur terrains plats avec oscillations GPS.',
@@ -4004,6 +4053,20 @@ const I18N={
   wc_a5_t:'🏁 Prédicteur de course',wc_a5_d:'Temps estimés sur 5 km, 10 km, semi-marathon et marathon selon votre allure seuil.',
   wc_a6_t:'⚠️ Alertes physiologiques',wc_a6_d:'StrideMetric vous prévient lorsqu\'une durée d\'effort dépasse le temps soutenable pour la zone choisie.',
   wc_contact:'Une suggestion ou un bug à signaler ? Écrivez-nous :',
+  wc_refs_title:'🔬 Références scientifiques',
+  wc_refs_intro:'Formules et modèles physiologiques/biomécaniques utilisés pour calculer les indicateurs (KPI) de cette application :',
+  wc_refs_note:'Note : les repères "g/kg/h" et "ml/kg/h" sont des valeurs pratiques usuelles de nutrition/hydratation sportive, à ajuster selon la tolérance individuelle. Ils ne remplacent pas l\'avis d\'un professionnel de santé.',
+  wc_ref1_d:'→ modèle de puissance vélo (gravité, aérodynamique, résistance au roulement)',
+  wc_ref2_d:'→ modèle de coût énergétique course à pied en pente',
+  wc_ref3_d:'→ modèle randonnée / marche avec charge portée',
+  wc_ref4_d:'→ FC max estimée (hommes)',
+  wc_ref5_d:'→ FC max estimée (femmes)',
+  wc_ref6_d:'→ zones de fréquence cardiaque (méthode de la réserve cardiaque)',
+  wc_ref7_d:'→ zones de puissance FTP et seuils de tenue d\'effort',
+  wc_ref8_d:'→ prédicteur de temps de course',
+  wc_ref9_d:'→ apports glucidiques recommandés par zone d\'intensité',
+  wc_ref10_d:'→ besoins hydriques selon sexe, température et durée',
+  wc_ref11_d:'→ équations métaboliques standard (VO2, VMA)',
   lbl_gpx_format:'Format .gpx standard — traces GPS avec altitude',
   msg_support_dropzone:'Aidez moi à financer un Bidon d\'Isotonique ou un Gel Énergétique 😅',
   msg_support_nutrition:'Le saviez-vous ? StrideMetric consomme aussi de l\'énergie pour calculer vos parcours ! ⚡ Offrez une banane ou un café au développeur'
@@ -4183,12 +4246,12 @@ const I18N={
   kpi_hr_avg:'Ø Herzrate',kpi_vam:'Anstiegsrate',
   kpi_spd_flat:'Ø Ebene',kpi_spd_climb:'Ø Anstieg',kpi_spd_avg:'Ø Geschw.',
   kpi_pace_avg:'Ø Tempo',kpi_pace_flat:'Tempo Ebene',kpi_pace_climb:'Tempo Anstieg',kpi_vma:'Gesch. MAS',kpi_vo2max:'Gesch. VO2max',
-  kpi_energy:'Energie verbraucht',kpi_carbs:'Kohlenhydrate',kpi_carbkcal:'KH-Zufuhr',
+  kpi_energy:'Energie verbraucht',kpi_carbneed:'Kohlenhydratbedarf',kpi_waterneed:'Flüssigkeitsbedarf',
   sec_profile:'Fahrerprofil',sec_hr:'Herzfrequenz',sec_ftp:'FTP Leistung',
   sec_speed:'Geschwindigkeit',sec_power:'Berechnete Leistung',sec_zones_pwr:'Leistungszonen + VAM',
   sec_zones_hr:'Herzfrequenzzonen',sec_nutrition:'Ernährung',sec_pauses:'Pausen',
   sec_optimizer:'Optimierer',
-  lbl_weight:'Körpergewicht',lbl_bike:'Rad + Ausrüstung',lbl_age:'Alter',
+  lbl_weight:'Körpergewicht',lbl_bike:'Ausrüstungsgewicht',lbl_age:'Alter',
   lbl_sex:'Geschlecht',lbl_sex_m:'Männlich',lbl_sex_f:'Weiblich',
   lbl_noise:'D+ Filter (min. pro Phase)',
   lbl_noise_hint:'Erhöhen um D+ bei GPS-Rauschen zu reduzieren.',
@@ -4261,6 +4324,20 @@ const I18N={
   wc_a5_t:'🏁 Wettkampf-Vorhersage',wc_a5_d:'Geschätzte Zeiten für 5 km, 10 km, Halbmarathon und Marathon basierend auf Ihrem Schwellentempo.',
   wc_a6_t:'⚠️ Physiologische Warnungen',wc_a6_d:'StrideMetric warnt Sie, wenn eine Belastungsdauer die für die gewählte Zone haltbare Zeit überschreitet.',
   wc_contact:'Ein Vorschlag oder ein Fehler zu melden? Schreiben Sie uns:',
+  wc_refs_title:'🔬 Wissenschaftliche Referenzen',
+  wc_refs_intro:'Physiologische/biomechanische Formeln und Modelle, die zur Berechnung der Kennzahlen (KPI) dieser App verwendet werden:',
+  wc_refs_note:'Hinweis: Die Richtwerte „g/kg/h" und „ml/kg/h" sind übliche Praxiswerte für Sporternährung/-hydration und sollten an die individuelle Verträglichkeit angepasst werden. Sie ersetzen keine ärztliche Beratung.',
+  wc_ref1_d:'→ Rad-Leistungsmodell (Schwerkraft, Aerodynamik, Rollwiderstand)',
+  wc_ref2_d:'→ Energiekostenmodell Laufen an Steigungen',
+  wc_ref3_d:'→ Wander-/Gehmodell mit Zusatzlast',
+  wc_ref4_d:'→ geschätzte max. HF (Männer)',
+  wc_ref5_d:'→ geschätzte max. HF (Frauen)',
+  wc_ref6_d:'→ HF-Zonen (Herzfrequenzreserve-Methode)',
+  wc_ref7_d:'→ FTP-Leistungszonen und Belastbarkeits-Schwellenwerte',
+  wc_ref8_d:'→ Wettkampfzeit-Vorhersage',
+  wc_ref9_d:'→ empfohlene Kohlenhydratzufuhr pro Intensitätszone',
+  wc_ref10_d:'→ Flüssigkeitsbedarf nach Geschlecht, Temperatur und Dauer',
+  wc_ref11_d:'→ Standard-Stoffwechselgleichungen (VO2, MAS)',
   lbl_gpx_format:'Standard .gpx-Format — GPS-Tracks mit Höhenprofil',
   msg_support_dropzone:'Helfen Sie mir, ein Iso-Getränk oder ein Energiegel zu finanzieren 😅',
   msg_support_nutrition:'Wussten Sie schon? Auch StrideMetric verbraucht Energie, um Ihre Strecken zu berechnen! ⚡ Spendieren Sie dem Entwickler eine Banane oder einen Kaffee'
@@ -4440,12 +4517,12 @@ const I18N={
   kpi_hr_avg:'FC media',kpi_vam:'VAM real',
   kpi_spd_flat:'V med. llano',kpi_spd_climb:'V med. subida',kpi_spd_avg:'V media total',
   kpi_pace_avg:'Ritmo medio',kpi_pace_flat:'Ritmo llano',kpi_pace_climb:'Ritmo subida',kpi_vma:'VAM est.',kpi_vo2max:'VO2max est.',
-  kpi_energy:'Energía gastada',kpi_carbs:'Carbohidratos',kpi_carbkcal:'Aporte carb.',
+  kpi_energy:'Energía gastada',kpi_carbneed:'Necesidad de carbohidratos',kpi_waterneed:'Necesidad de agua',
   sec_profile:'Perfil Ciclista',sec_hr:'Frecuencia Cardíaca',sec_ftp:'Potencia FTP',
   sec_speed:'Velocidades',sec_power:'Potencia Calculada',sec_zones_pwr:'Zonas Potencia + VAM',
   sec_zones_hr:'Zonas Frecuencia Cardíaca',sec_nutrition:'Nutrición',sec_pauses:'Paradas',
   sec_optimizer:'Optimizador',
-  lbl_weight:'Peso corporal',lbl_bike:'Bici + equipo',lbl_age:'Edad',
+  lbl_weight:'Peso corporal',lbl_bike:'Peso del equipo',lbl_age:'Edad',
   lbl_sex:'Sexo',lbl_sex_m:'Hombre',lbl_sex_f:'Mujer',
   lbl_noise:'Filtro D+ (mín. por fase)',
   lbl_noise_hint:'Aumentar para reducir D+ en terrenos planos con ruido GPS.',
@@ -4518,6 +4595,20 @@ const I18N={
   wc_a5_t:'🏁 Predictor de carrera',wc_a5_d:'Tiempos estimados para 5 km, 10 km, media maratón y maratón según tu ritmo umbral.',
   wc_a6_t:'⚠️ Alertas fisiológicas',wc_a6_d:'StrideMetric te avisa cuando una duración de esfuerzo supera el tiempo sostenible para la zona elegida.',
   wc_contact:'¿Una sugerencia o un error que reportar? Escríbenos:',
+  wc_refs_title:'🔬 Referencias científicas',
+  wc_refs_intro:'Fórmulas y modelos fisiológicos/biomecánicos utilizados para calcular los indicadores (KPI) de esta aplicación:',
+  wc_refs_note:'Nota: los valores de referencia "g/kg/h" y "ml/kg/h" son cifras prácticas habituales de nutrición/hidratación deportiva, a ajustar según la tolerancia individual. No sustituyen el consejo de un profesional de la salud.',
+  wc_ref1_d:'→ modelo de potencia en bicicleta (gravedad, aerodinámica, resistencia a la rodadura)',
+  wc_ref2_d:'→ modelo de coste energético al correr en pendiente',
+  wc_ref3_d:'→ modelo de senderismo / marcha con carga',
+  wc_ref4_d:'→ FC máx estimada (hombres)',
+  wc_ref5_d:'→ FC máx estimada (mujeres)',
+  wc_ref6_d:'→ zonas de frecuencia cardiaca (método de la reserva cardiaca)',
+  wc_ref7_d:'→ zonas de potencia FTP y umbrales de sostenibilidad del esfuerzo',
+  wc_ref8_d:'→ predictor de tiempo de carrera',
+  wc_ref9_d:'→ aporte de carbohidratos recomendado por zona de intensidad',
+  wc_ref10_d:'→ necesidades hídricas según sexo, temperatura y duración',
+  wc_ref11_d:'→ ecuaciones metabólicas estándar (VO2, VAM)',
   lbl_gpx_format:'Formato .gpx estándar — trazas GPS con altitud',
   msg_support_dropzone:'Ayúdame a financiar una bebida isotónica o un gel energético 😅',
   msg_support_nutrition:'¿Sabías que? StrideMetric también consume energía al calcular tus rutas! ⚡ Invita al desarrollador a un plátano o un café'
@@ -4669,12 +4760,12 @@ const I18N={
   kpi_hr_avg:'FC media',kpi_vam:'VAM reale',
   kpi_spd_flat:'V med. pianura',kpi_spd_climb:'V med. salita',kpi_spd_avg:'V media totale',
   kpi_pace_avg:'Ritmo medio',kpi_pace_flat:'Ritmo piano',kpi_pace_climb:'Ritmo salita',kpi_vma:'VAM stim.',kpi_vo2max:'VO2max stim.',
-  kpi_energy:'Energia spesa',kpi_carbs:'Carboidrati',kpi_carbkcal:'Apporto carb.',
+  kpi_energy:'Energia spesa',kpi_carbneed:'Fabbisogno carboidrati',kpi_waterneed:'Fabbisogno idrico',
   sec_profile:'Profilo Ciclista',sec_hr:'Frequenza Cardiaca',sec_ftp:'Potenza FTP',
   sec_speed:'Velocità',sec_power:'Potenza Calcolata',sec_zones_pwr:'Zone Potenza + VAM',
   sec_zones_hr:'Zone Frequenza Cardiaca',sec_nutrition:'Nutrizione',sec_pauses:'Soste',
   sec_optimizer:'Ottimizzatore',
-  lbl_weight:'Peso corporeo',lbl_bike:'Bici + attrezzatura',lbl_age:'Età',
+  lbl_weight:'Peso corporeo',lbl_bike:'Peso attrezzatura',lbl_age:'Età',
   lbl_sex:'Sesso',lbl_sex_m:'Uomo',lbl_sex_f:'Donna',
   lbl_noise:'Filtro D+ (min. per fase)',
   lbl_noise_hint:'Aumentare per ridurre D+ su terreni piatti con rumore GPS.',
@@ -4747,6 +4838,20 @@ const I18N={
   wc_a5_t:'🏁 Predittore di gara',wc_a5_d:'Tempi stimati per 5 km, 10 km, mezza maratona e maratona in base al tuo ritmo soglia.',
   wc_a6_t:'⚠️ Avvisi fisiologici',wc_a6_d:'StrideMetric ti avverte quando una durata di sforzo supera il tempo sostenibile per la zona scelta.',
   wc_contact:'Un suggerimento o un bug da segnalare? Scrivici:',
+  wc_refs_title:'🔬 Riferimenti scientifici',
+  wc_refs_intro:'Formule e modelli fisiologici/biomeccanici utilizzati per calcolare gli indicatori (KPI) di questa applicazione:',
+  wc_refs_note:'Nota: i valori di riferimento "g/kg/h" e "ml/kg/h" sono cifre pratiche abituali di nutrizione/idratazione sportiva, da adattare in base alla tolleranza individuale. Non sostituiscono il parere di un professionista sanitario.',
+  wc_ref1_d:'→ modello di potenza in bici (gravità, aerodinamica, resistenza al rotolamento)',
+  wc_ref2_d:'→ modello di costo energetico della corsa in pendenza',
+  wc_ref3_d:'→ modello escursionismo / camminata con carico',
+  wc_ref4_d:'→ FC max stimata (uomini)',
+  wc_ref5_d:'→ FC max stimata (donne)',
+  wc_ref6_d:'→ zone di frequenza cardiaca (metodo della riserva cardiaca)',
+  wc_ref7_d:'→ zone di potenza FTP e soglie di sostenibilità dello sforzo',
+  wc_ref8_d:'→ predittore del tempo di gara',
+  wc_ref9_d:'→ apporto di carboidrati consigliato per zona di intensità',
+  wc_ref10_d:'→ fabbisogno idrico in base a sesso, temperatura e durata',
+  wc_ref11_d:'→ equazioni metaboliche standard (VO2, VAM)',
   lbl_gpx_format:'Formato .gpx standard — tracce GPS con altitudine',
   msg_support_dropzone:'Aiutami a finanziare una bevanda isotonica o un gel energetico 😅',
   msg_support_nutrition:'Lo sapevi? Anche StrideMetric consuma energia per calcolare i tuoi percorsi! ⚡ Offri una banana o un caffè allo sviluppatore'
@@ -4898,12 +5003,12 @@ const I18N={
   kpi_hr_avg:'Gem. HF',kpi_vam:'Klimsnelheid',
   kpi_spd_flat:'Gem. vlak',kpi_spd_climb:'Gem. klimmen',kpi_spd_avg:'Gem. totaal',
   kpi_pace_avg:'Gem. tempo',kpi_pace_flat:'Tempo vlak',kpi_pace_climb:'Tempo klimmen',kpi_vma:'Gesch. MAS',kpi_vo2max:'Gesch. VO2max',
-  kpi_energy:'Energie verbraucht',kpi_carbs:'Koolhydraten',kpi_carbkcal:'KH-inname',
+  kpi_energy:'Energie verbraucht',kpi_carbneed:'Koolhydraatbehoefte',kpi_waterneed:'Waterbehoefte',
   sec_profile:'Rijdersprofiel',sec_hr:'Hartfrequentie',sec_ftp:'FTP Vermogen',
   sec_speed:'Snelheden',sec_power:'Berekend Vermogen',sec_zones_pwr:'Vermogenszones + VAM',
   sec_zones_hr:'Hartfrequentiezones',sec_nutrition:'Voeding',sec_pauses:'Pauzes',
   sec_optimizer:'Optimalisator',
-  lbl_weight:'Lichaamsgewicht',lbl_bike:'Fiets + uitrusting',lbl_age:'Leeftijd',
+  lbl_weight:'Lichaamsgewicht',lbl_bike:'Uitrustingsgewicht',lbl_age:'Leeftijd',
   lbl_sex:'Geslacht',lbl_sex_m:'Man',lbl_sex_f:'Vrouw',
   lbl_noise:'D+ filter (min. per fase)',
   lbl_noise_hint:'Verhogen om D+ te verminderen bij GPS-ruis op vlak terrein.',
@@ -4976,6 +5081,20 @@ const I18N={
   wc_a5_t:'🏁 Wedstrijdvoorspeller',wc_a5_d:'Geschatte tijden voor 5 km, 10 km, halve marathon en marathon op basis van uw drempeltempo.',
   wc_a6_t:'⚠️ Fysiologische waarschuwingen',wc_a6_d:'StrideMetric waarschuwt u wanneer een inspanningsduur de haalbare tijd voor de gekozen zone overschrijdt.',
   wc_contact:'Een suggestie of een bug te melden? Schrijf ons:',
+  wc_refs_title:'🔬 Wetenschappelijke referenties',
+  wc_refs_intro:'Fysiologische/biomechanische formules en modellen die worden gebruikt om de KPI\'s van deze app te berekenen:',
+  wc_refs_note:'Let op: de richtwaarden "g/kg/h" en "ml/kg/h" zijn gangbare praktische sportvoedings-/hydratatiewaarden, aan te passen aan individuele tolerantie. Ze vervangen geen advies van een zorgprofessional.',
+  wc_ref1_d:'→ fietsvermogensmodel (zwaartekracht, aerodynamica, rolweerstand)',
+  wc_ref2_d:'→ energiekostenmodel hardlopen op hellingen',
+  wc_ref3_d:'→ wandelmodel met belasting (rugzak)',
+  wc_ref4_d:'→ geschatte max. HF (mannen)',
+  wc_ref5_d:'→ geschatte max. HF (vrouwen)',
+  wc_ref6_d:'→ hartslagzones (hartslagreserve-methode)',
+  wc_ref7_d:'→ FTP-vermogenszones en inspanningsdrempels',
+  wc_ref8_d:'→ wedstrijdtijd-voorspeller',
+  wc_ref9_d:'→ aanbevolen koolhydraatinname per intensiteitszone',
+  wc_ref10_d:'→ vochtbehoefte op basis van geslacht, temperatuur en duur',
+  wc_ref11_d:'→ standaard metabole vergelijkingen (VO2, MAS)',
   lbl_gpx_format:'Standaard .gpx-formaat — GPS-tracks met hoogteprofiel',
   msg_support_dropzone:'Help me een isotone drank of energiegel te financieren 😅',
   msg_support_nutrition:'Wist je dat? StrideMetric verbruikt ook energie om je routes te berekenen! ⚡ Trakteer de ontwikkelaar op een banaan of een kopje koffie'
@@ -5216,6 +5335,7 @@ function collectSettings(){
  s._swFtpAuto = document.getElementById('sw-ftp-auto')      ? document.getElementById('sw-ftp-auto').classList.contains('on')      : false;
  s._swThresh  = document.getElementById('sw-threshold-auto')? document.getElementById('sw-threshold-auto').classList.contains('on'): true;
  s._sport        = currentSport;
+ s._equipWeightBySport = (typeof equipWeightBySport!=='undefined') ? equipWeightBySport : undefined;
  s._paceMode     = paceMode;
  s._hrModel      = hrModel;
  s._pwrModel     = pwrModel;
@@ -5339,6 +5459,16 @@ function applySettings(s){
   if(_desRow) _desRow.style.display=(s._sport==='cycling')?'':'none';
   const _secP=document.querySelector('[data-sec="sec_profile"]');
   if(_secP){const pk={hiking:'sec_profile_hiking',running:'sec_profile_running',cycling:'sec_profile_cycling'};_secP.textContent=t(pk[s._sport]||'sec_profile');}
+  // Equipment weight range for restored sport
+  if(typeof EQUIP_WEIGHT_RANGES!=='undefined'){
+   const _eqEl=document.getElementById('bike-weight');
+   const _eqR=EQUIP_WEIGHT_RANGES[s._sport]||EQUIP_WEIGHT_RANGES.cycling;
+   if(_eqEl){ _eqEl.min=_eqR.min; _eqEl.max=_eqR.max; _eqEl.step=_eqR.step; }
+  }
+ }
+ // Restore per-sport equipment weight memory
+ if(s._equipWeightBySport && typeof equipWeightBySport!=='undefined'){
+  equipWeightBySport = Object.assign({}, EQUIP_WEIGHT_DEFAULTS, s._equipWeightBySport);
  }
  // Restore pace mode
  if(s._paceMode!==undefined){
@@ -5820,7 +5950,7 @@ function renderRunningZones(){
     const row=document.createElement('div');
     row.className='zone-row';
     row.style.cssText=`border-left:3px solid ${z.color};padding:2px 5px;margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;font-size:9px`;
-    row.innerHTML=`<span style="color:${z.color};font-weight:700">Z${z.z} ${z.name}</span>`
+    row.innerHTML=`<span style="color:${zoneTextColor(z.color)};font-weight:700">Z${z.z} ${z.name}</span>`
       +`<span style="color:var(--text2);font-family:'JetBrains Mono',monospace">${fmt(lo)}–${fmt(hi)}/km</span>`
       +`<span style="color:var(--text2)">${loHR}–${hiHR}bpm</span>`;
     tbl.appendChild(row);
@@ -6042,9 +6172,29 @@ const SPORT_CONFIGS = {
   cycling:    {hideFTP:false, hidePower:false, hidePowerZones:false, hideVAM:false, hidePace:true,  maxOptDur:720,  optDurStep:15, label:()=>t('sport_cycling')},
 };
 
+// Equipment weight ("Poids équipement") — independent per sport:
+// each sport remembers its own value/range (bike for cycling, backpack for hiking, running gear for running)
+const EQUIP_WEIGHT_RANGES = {
+  cycling: {min:3, max:30, step:0.1},
+  hiking:  {min:0, max:15, step:0.5},
+  running: {min:0, max:5,  step:0.1},
+};
+const EQUIP_WEIGHT_DEFAULTS = {cycling:10, hiking:5, running:0.3};
+let equipWeightBySport = Object.assign({}, EQUIP_WEIGHT_DEFAULTS);
+
 function setSport(sport){
+  const _prevSport=currentSport;
   currentSport=sport;
   const cfg=SPORT_CONFIGS[sport]||SPORT_CONFIGS.cycling;
+
+  // Equipment weight — remember previous sport's value, restore this sport's own value
+  const equipInput=document.getElementById('bike-weight');
+  if(equipInput){
+    if(_prevSport) equipWeightBySport[_prevSport]=parseFloat(equipInput.value) || equipWeightBySport[_prevSport];
+    const eqRange=EQUIP_WEIGHT_RANGES[sport]||EQUIP_WEIGHT_RANGES.cycling;
+    equipInput.min=eqRange.min; equipInput.max=eqRange.max; equipInput.step=eqRange.step;
+    equipInput.value=(equipWeightBySport[sport]!==undefined) ? equipWeightBySport[sport] : (EQUIP_WEIGHT_DEFAULTS[sport]||10);
+  }
 
   // Update body class for CSS-driven hiding
   document.body.className=document.body.className.replace(/sport-\w+/g,'');
@@ -6347,6 +6497,13 @@ function applyHelpModalTranslations(){
     'hm-a5-t':'wc_a5_t','hm-a5-d':'wc_a5_d',
     'hm-a6-t':'wc_a6_t','hm-a6-d':'wc_a6_d',
     'hm-contact':'wc_contact',
+    'hm-refs-title':'wc_refs_title',
+    'hm-refs-intro':'wc_refs_intro',
+    'hm-refs-note':'wc_refs_note',
+    'hm-ref1-d':'wc_ref1_d','hm-ref2-d':'wc_ref2_d','hm-ref3-d':'wc_ref3_d',
+    'hm-ref4-d':'wc_ref4_d','hm-ref5-d':'wc_ref5_d','hm-ref6-d':'wc_ref6_d',
+    'hm-ref7-d':'wc_ref7_d','hm-ref8-d':'wc_ref8_d','hm-ref9-d':'wc_ref9_d',
+    'hm-ref10-d':'wc_ref10_d','hm-ref11-d':'wc_ref11_d',
   };
   for(const [id, key] of Object.entries(keyMap)){
     const el = document.getElementById(id);
@@ -6498,7 +6655,7 @@ function drawNutritionTable(segs) {
   });
   const totalSec = segs.reduce((a,s)=>a+s.timeMins*60, 0);
 
-  const zColors = ['#3b82f6','#4ae870','#ffd700','#ff8c00','#ff2040'];
+  const zColors = ['#3b82f6',zoneTextColor('#4ae870'),zoneTextColor('#ffd700'),'#ff8c00','#ff2040'];
   // Zone names — translated
   const zNames = sport==='running'
     ? [t('nutr_z1_run'),t('nutr_z2_run'),t('nutr_z3_run'),t('nutr_z4_run'),t('nutr_z5_run')]
@@ -7137,7 +7294,7 @@ function showPhysioPopup(msg, detail, type){
           <th style="padding:2px 4px">${t('physio_col_max')}</th>
         </tr>
         ${PHYSIO_LIMITS.map(l=>`<tr style="border-top:1px solid var(--border2)">
-          <td style="padding:2px 4px;color:#${['3b82f6','4ae870','ffd700','ff8c00','ff2040'][l.z-1]};font-weight:700">${l.name}</td>
+          <td style="padding:2px 4px;color:${zoneTextColor('#'+['3b82f6','4ae870','ffd700','ff8c00','ff2040'][l.z-1])};font-weight:700">${l.name}</td>
           <td style="padding:2px 4px;text-align:center;color:var(--text2)">${l.desc}</td>
           <td style="padding:2px 4px;text-align:center">${formatHours(l.minH)}–${formatHours(l.maxH)}</td>
         </tr>`).join('')}
@@ -7695,10 +7852,10 @@ function switchTab(tabName) {
   const panel = document.getElementById('tab-' + tabName);
   if (panel) panel.style.display = '';
   // Zoom control only affects the route/profile charts (map, elevation,
-  // timing, climbs) — it has no effect on the nutrition or effort (physio)
-  // tabs, so hide it there to avoid a misleading control.
+  // timing, climbs) — it has no effect on the nutrition, effort (physio)
+  // or zones tabs, so hide it there to avoid a misleading control.
   const zoomContainer = document.getElementById('zoom-container');
-  if (zoomContainer) zoomContainer.style.display = (tabName === 'nutrition' || tabName === 'physio') ? 'none' : '';
+  if (zoomContainer) zoomContainer.style.display = (tabName === 'nutrition' || tabName === 'physio' || tabName === 'zones') ? 'none' : '';
   if (segCalcCache) requestAnimationFrame(() => drawAllCharts(segCalcCache));
 }
 
@@ -7731,7 +7888,7 @@ updateProfileKPIs();
  &nbsp;·&nbsp;
  <a href="mailto:stridemetric@proton.me" style="color:var(--text2);text-decoration:none" title="Contact">stridemetric@proton.me</a>
  &nbsp;·&nbsp;
- <a href="https://buymeacoffee.com/stridemetric" target="_blank" rel="noopener" style="color:var(--text2);text-decoration:none" title="Buy me a coffee ☕">☕</a>
+ <a href="https://buymeacoffee.com/stridemetric" target="_blank" rel="noopener" style="color:var(--text2);text-decoration:none;font-size:16px;vertical-align:middle;line-height:1" title="Buy me a coffee ☕">☕</a>
 </footer>
 
 
