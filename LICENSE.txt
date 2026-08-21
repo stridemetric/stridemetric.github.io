@@ -1,0 +1,10 @@
+Copyright (c) 2026 StrideMetric. Tous droits réservés.
+
+PROPRIÉTÉ INTELLECTUELLE ET RESTRICTIONS D'UTILISATION :
+Il est strictement interdit de copier, reproduire, distribuer, modifier, republier, 
+transférer ou utiliser le code source (HTML, CSS, JavaScript) de cette application, 
+en tout ou en partie, sans l'autorisation écrite préalable et expresse du titulaire 
+du droit d'auteur.
+
+L'accès public au site web ne confère aucun droit de propriété intellectuelle 
+ou de réutilisation du code à l'utilisateur.
