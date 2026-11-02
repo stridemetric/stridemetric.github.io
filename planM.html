@@ -945,6 +945,50 @@
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
 
+
+/* ---- Suivi adaptatif ---- */
+.session-card { position: relative; }
+.session-check {
+  margin-top: 12px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: var(--r-md);
+  background: var(--surface-2); display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+}
+.session-check.is-done { border-style: solid; border-color: color-mix(in srgb, var(--green) 35%, var(--line)); background: color-mix(in srgb, var(--green) 6%, var(--surface-2)); }
+.session-check.is-missed { border-color: color-mix(in srgb, var(--orange) 45%, var(--line)); background: color-mix(in srgb, var(--orange) 7%, var(--surface-2)); }
+.session-check.is-future { opacity: .72; }
+.check-label { display: flex; align-items: center; gap: 9px; font-size: .84rem; font-weight: 600; cursor: pointer; user-select: none; }
+.check-label input { position: absolute; opacity: 0; pointer-events: none; }
+.check-box { width: 22px; height: 22px; border: 1.8px solid var(--line-strong); border-radius: 6px; display: grid; place-items: center; background: var(--surface); transition: all .18s var(--ease); flex: none; }
+.check-box::after { content:""; width:6px; height:10px; border: 2px solid transparent; border-left:0; border-top:0; transform: rotate(45deg) translateY(-1px); opacity:0; transition: opacity .12s; }
+.check-label input:checked + .check-box { background: var(--green); border-color: var(--green); }
+.check-label input:checked + .check-box::after { border-color: var(--on-green); opacity:1; }
+.check-label input:disabled + .check-box { opacity:.45; cursor:not-allowed; }
+.check-status { font-size: .74rem; color: var(--muted); }
+.check-status--done { color: var(--green); font-weight:700; }
+.check-status--missed { color: var(--orange); font-weight:700; }
+.check-status--future { color: var(--faint); }
+.session-card.is-missed { box-shadow: inset 3px 0 0 var(--orange-soft); }
+.session-card.is-done { box-shadow: inset 3px 0 0 var(--green-3); }
+.session-card.is-future { opacity:.92; }
+.session-card.is-future .chart-panel { opacity:.7; }
+.adapt-banner { margin-top: 12px; padding: 9px 12px; border-radius: var(--r-sm); background: color-mix(in srgb, var(--orange) 10%, var(--surface-2)); border:1px solid color-mix(in srgb, var(--orange) 22%, var(--line)); color: var(--muted); font-size:.78rem; line-height:1.45; }
+.adapt-banner strong { color: var(--text); }
+.week-progress { margin: 12px 0 16px; padding: 14px 16px; background: var(--surface); border:1px solid var(--line); border-radius: var(--r-lg); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.progress-main { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.progress-dots { display:flex; gap:8px; }
+.progress-dot { width:10px; height:10px; border-radius:50%; background: var(--line); border:1px solid var(--line-strong); }
+.progress-dot.is-done { background: var(--green); border-color: var(--green); }
+.progress-dot.is-missed { background: var(--orange); border-color: var(--orange); }
+.progress-dot.is-future { background: var(--line); opacity:.55; }
+.progress-text { font-size:.86rem; }
+.progress-text strong { font-family: var(--font-display); }
+.progress-pct { font-size:.84rem; color: var(--muted); font-weight:700; background: var(--surface-2); border:1px solid var(--line); padding:2px 8px; border-radius:999px; }
+.current-week-badge { display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:999px; background: var(--green); color: var(--on-green); font-size:.68rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; margin-left:8px; vertical-align:middle; }
+.current-week-badge i { width:6px; height:6px; border-radius:50%; background: var(--on-green); display:inline-block; animation: pulseDot 2s infinite; }
+@keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:.45} }
+.interruption-notice { margin: 0 0 14px; padding:12px 14px; border-radius: var(--r-md); background: var(--surface); border:1px solid var(--line); border-left:4px solid var(--orange); font-size:.84rem; line-height:1.5; color: var(--muted); }
+.interruption-notice strong { color: var(--text); }
+.outside-notice { margin:0 0 14px; padding:12px 14px; border-radius: var(--r-md); background: color-mix(in srgb, var(--gold) 9%, var(--surface)); border:1px solid color-mix(in srgb, var(--gold) 28%, var(--line)); font-size:.84rem; color: var(--muted); }
+
 </style>
 </head>
 <body>
@@ -1049,8 +1093,9 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
   };
 
   /* ------------------------------------------------------------------ data */
-  const WEEKS = D.weeks;
-  const WEEK_BY_N = new Map(WEEKS.map(week => [week.n, week]));
+  const ORIGINAL_WEEKS = D.weeks.map(w => JSON.parse(JSON.stringify(w)));
+  let WEEKS = ORIGINAL_WEEKS.map(w => JSON.parse(JSON.stringify(w)));
+  let WEEK_BY_N = new Map(WEEKS.map(week => [week.n, week]));
   const PHASES = D.phases;
   const PHASE_BY_NUM = new Map(PHASES.map(phase => [phase.num, phase]));
   const TABS = ['semaine', 'plan', 'zones', 'strava', 'reperes'];
@@ -1069,6 +1114,8 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
   const savedPref = store.get('vercors2027:pref', null);
   const savedRef = store.get('vercors2027:ref5k', null);
   const savedTarget = store.get('vercors2027:target', null);
+  const savedDone = store.get('vercors2027:done', null);
+  let doneMap = (savedDone && typeof savedDone === 'object' && !Array.isArray(savedDone)) ? savedDone : {};
   const defaultTarget = D.course.targets[0].sec;
 
   const state = {
@@ -1079,6 +1126,8 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
     ref5k: Number.isFinite(savedRef) && savedRef >= 900 && savedRef <= 2700 ? savedRef : D.reference5k.sec,
     raceTarget: D.course.targets.some(target => target.sec === savedTarget) ? savedTarget : defaultTarget
   };
+
+  let ADAPT_INFO = null;
 
   /* ------------------------------------------------------------------ dates & numbers */
   function parseISO(iso) {
@@ -1110,6 +1159,291 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
 
   function isPlanPeriod() {
     return TODAY >= PLAN_START && TODAY <= RACE_DATE;
+  }
+
+  /* -------------------------------------------------- adaptatif moteur coach */
+  function deepCloneWeek(w){ return JSON.parse(JSON.stringify(w)); }
+
+  function adaptRunSegments(segments, factor, offset){
+    if (!segments || !segments.length) return segments;
+    return segments.map(seg=>{
+      const s = {...seg};
+      const labelLow = String(seg.label||'').toLowerCase();
+      const isHard = ['Z4','Z4+','Z5','Z3+'].includes(seg.zone) || seg.kind==='interval' || /fractionné|seuil|allure|1000|vma|seuil/i.test(labelLow);
+      if (factor < 0.999){
+        if (seg.kind==='interval' || isHard){
+          if (factor <= 0.62){
+            s.zone='Z2';
+            s.min=Math.max(1, Math.round(seg.min*0.5));
+            s.label=seg.label+' → EF adaptée';
+            if (s.detail) s.detail+=' · adapté reprise';
+          } else if (factor <= 0.82){
+            if (['Z5','Z4+','Z4'].includes(seg.zone)) s.zone='Z3';
+            else if (seg.zone==='Z3+') s.zone='Z2';
+            s.min=Math.max(1, Math.round(seg.min*factor));
+            s.label=seg.label+' (allégé)';
+          } else {
+            s.min=Math.max(1, Math.round(seg.min*factor));
+          }
+        } else {
+          s.min=Math.max(1, Math.round(seg.min*Math.min(1, factor+0.12)));
+        }
+      }
+      return s;
+    });
+  }
+
+  function adaptBikeSegments(segments, factor, offset){
+    if (!segments || !segments.length) return segments;
+    return segments.map(seg=>{
+      const s = {...seg};
+      const isHard = (seg.pctLow && seg.pctLow>=80) || ['Z4','Z4+','Z5'].includes(seg.zone);
+      if (factor < 0.999){
+        if (isHard && factor <= 0.68){
+          s.pctLow=Math.round((seg.pctLow||0)*0.72);
+          s.pctHigh=Math.round((seg.pctHigh||0)*0.72);
+          s.zone='Z2';
+          s.detail=(seg.detail||'')+' · adapté EF';
+          s.min=Math.max(1, Math.round(seg.min*factor*0.7));
+        } else {
+          s.min=Math.max(1, Math.round(seg.min*factor));
+          if (isHard){
+            s.pctLow=Math.round((seg.pctLow||0)*0.9);
+            s.pctHigh=Math.round((seg.pctHigh||0)*0.9);
+          }
+        }
+      }
+      return s;
+    });
+  }
+
+  function buildAdaptedPlan(originalWeeks, doneMap, today){
+    const adapted = originalWeeks.map(w=> JSON.parse(JSON.stringify(w)));
+    const todayStart = today;
+    const curWeekNum = (function(){
+      const diff = Math.floor((todayStart - parseISO(D.meta.planStart)) / DAY_MS);
+      return clamp(Math.floor(diff/7)+1,1,32);
+    })();
+
+    let consecutiveMissed=0;
+    for (let n=curWeekNum-1; n>=1; n--){
+      const orig = originalWeeks[n-1];
+      const types=['short','long','bike'];
+      let pastCount=0, missedCount=0;
+      types.forEach(t=>{
+        const iso = orig[t] && orig[t].date;
+        if (!iso) return;
+        const d = parseISO(iso);
+        if (d <= todayStart){
+          pastCount++;
+          const id = `${orig.n}-${t}`;
+          if (!doneMap[id]) missedCount++;
+        }
+      });
+      if (pastCount===0) continue;
+      if (missedCount===pastCount && pastCount===3){
+        consecutiveMissed++;
+      } else {
+        if (consecutiveMissed>0) break;
+        const anyDone = pastCount - missedCount >0;
+        if (anyDone) break;
+      }
+    }
+
+    let missedLong=false;
+    if (curWeekNum>1){
+      const prev = originalWeeks[curWeekNum-2];
+      if (prev){
+        const d=parseISO(prev.long.date);
+        if (d<=todayStart){
+          const id=`${prev.n}-long`;
+          if (!doneMap[id]) missedLong=true;
+        }
+      }
+    }
+
+    let interruption=null;
+    if (consecutiveMissed>0) interruption={weeks:consecutiveMissed, type:'full', curWeekNum};
+    else if (missedLong) interruption={weeks:0, type:'long_missed', curWeekNum};
+
+    if (!interruption){
+      return {weeks: adapted, interruption: null};
+    }
+
+    let factors;
+    if (consecutiveMissed>=3) factors=[0.5,0.65,0.8,0.9,1.0];
+    else if (consecutiveMissed===2) factors=[0.6,0.8,0.9,1.0];
+    else if (consecutiveMissed===1) factors=[0.7,0.85,0.95,1.0];
+    else factors=[0.9,1.0];
+
+    for (let off=0; off<factors.length; off++){
+      const weekNum = curWeekNum + off;
+      if (weekNum>32) break;
+      const w = adapted[weekNum-1];
+      const orig = originalWeeks[weekNum-1];
+      if (w.isRace) continue;
+      if (w.isRecovery){
+        if (off===0 && consecutiveMissed>0){
+          w._adapted=true;
+          w._adaptNote=`Semaine allégée préservée après ${consecutiveMissed} sem. d'arrêt · reprise en douceur`;
+        }
+        continue;
+      }
+      if (w.phaseNum===5){
+        if (consecutiveMissed>0 && off===0){
+          w._adapted=true;
+          w._adaptNote='Affutage adapte · reprise tres progressive, pas d intensite';
+          w.totalMin=Math.round(orig.totalMin*0.85);
+          w.runMin=Math.round(orig.runMin*0.85);
+          w.bikeMin=Math.round(orig.bikeMin*0.85);
+          w.long.total=Math.round(orig.long.total*0.8);
+          w.short.total=Math.round(orig.short.total*0.8);
+          w.bike.total=Math.round(orig.bike.total*0.8);
+        }
+        continue;
+      }
+      const factor = factors[off];
+      if (factor>=0.999) continue;
+      w._adapted=true;
+      w._originalTotalMin=orig.totalMin;
+      w.totalMin=Math.round(orig.totalMin*factor);
+      w.runMin=Math.round(orig.runMin*factor);
+      w.bikeMin=Math.round(orig.bikeMin*factor);
+      w.km=[orig.km[0]*factor, orig.km[1]*factor];
+      let longCap=null;
+      if (off===0){
+        if (consecutiveMissed>=2) longCap=70;
+        else if (consecutiveMissed===1) longCap=85;
+        else longCap=Math.round(orig.long.total*0.9);
+      }
+      let newLongTotal=Math.round(orig.long.total*factor);
+      if (longCap!==null && newLongTotal>longCap) newLongTotal=longCap;
+      w.long.total=newLongTotal;
+      w.long.km=[orig.long.km[0]*factor, orig.long.km[1]*factor];
+      w.long.dplus=Math.round(orig.long.dplus*factor);
+      w.long.segments=adaptRunSegments(orig.long.segments, factor, off);
+      w.short.total=Math.round(orig.short.total*factor);
+      w.short.km=[orig.short.km[0]*factor, orig.short.km[1]*factor];
+      w.short.segments=adaptRunSegments(orig.short.segments, factor, off);
+      w.bike.total=Math.round(orig.bike.total*factor);
+      w.bike.segments=adaptBikeSegments(orig.bike.segments, factor, off);
+      if (w.zoneMinRun){
+        const nz={}; Object.keys(orig.zoneMinRun||{}).forEach(k=>{ nz[k]=Math.round((orig.zoneMinRun[k]||0)*factor); }); w.zoneMinRun=nz;
+      }
+      if (w.zoneMinBike){
+        const nz={}; Object.keys(orig.zoneMinBike||{}).forEach(k=>{ nz[k]=Math.round((orig.zoneMinBike[k]||0)*factor); }); w.zoneMinBike=nz;
+      }
+      if (w.zoneMin){
+        const nz={}; Object.keys(orig.zoneMin||{}).forEach(k=>{ nz[k]=Math.round((orig.zoneMin[k]||0)*factor); }); w.zoneMin=nz;
+      }
+      if (off===0){
+        w._adaptNote = consecutiveMissed>0 ? `Reprise apres ${consecutiveMissed} sem. d'interruption · ${Math.round(factor*100)}% du volume prevu` : `Sortie longue manquee · volume reduit a ${Math.round(factor*100)}% pour reprise`;
+      } else {
+        w._adaptNote = `Progression reprise · ${Math.round(factor*100)}% du volume initial`;
+      }
+      if (off>0){
+        const prev=adapted[weekNum-2];
+        if (prev && !prev.isRecovery && prev.phaseNum!==5 && !prev.isRace){
+          const maxAllowed = prev.totalMin*1.10;
+          if (w.totalMin>maxAllowed){ w.totalMin=Math.round(maxAllowed); }
+        }
+      }
+    }
+
+    for (let n=curWeekNum+factors.length; n<=32; n++){
+      const w=adapted[n-1];
+      const prev=adapted[n-2];
+      if (!prev || w.isRace || w.isRecovery || w.phaseNum===5) continue;
+      if (!prev._adapted) continue;
+      const maxAllowed=prev.totalMin*1.15;
+      if (w.totalMin>maxAllowed){
+        w.totalMin=Math.round(maxAllowed);
+        w._adapted=true;
+        if (!w._adaptNote) w._adaptNote='Progression lissee a +15% max apres reprise';
+      }
+    }
+
+    return {weeks: adapted, interruption};
+  }
+
+  function weekProgressMarkup(week){
+    const types=['short','long','bike'];
+    let doneCount=0, missedCount=0;
+    const dots=types.map(t=>{
+      const iso=week[t] && week[t].date;
+      if (!iso) return '';
+      const d=parseISO(iso);
+      const id=`${week.n}-${t}`;
+      const done=!!doneMap[id];
+      const isFuture=d> TODAY;
+      const isMissed= d < TODAY && !done;
+      if (done) doneCount++;
+      if (isMissed) missedCount++;
+      let cls='progress-dot';
+      if (done) cls+=' is-done';
+      else if (isMissed) cls+=' is-missed';
+      else if (isFuture) cls+=' is-future';
+      return `<span class="${cls}" title="${t}"></span>`;
+    }).join('');
+    const pct= Math.round(doneCount/3*100);
+    const missedTxt= missedCount ? ` · <span style="color:var(--orange)">${missedCount} manquée(s)</span>` : '';
+    return `<div class="week-progress"><div class="progress-main"><div class="progress-dots">${dots}</div><span class="progress-text"><strong>${doneCount}/3</strong> réalisées${missedTxt}</span></div><span class="progress-pct">${pct}%</span></div>`;
+  }
+
+  function interruptionNotice(){
+    if (!ADAPT_INFO) return '';
+    if (ADAPT_INFO.type==='full'){
+      return `<div class="interruption-notice"><strong>Interruption détectée : ${ADAPT_INFO.weeks} semaine(s) sans entraînement</strong><br>Le programme a été adapté automatiquement pour une reprise progressive. Les semaines allégées, l'affûtage et la date du marathon sont préservés. Aucun rattrapage brutal n'est programmé.</div>`;
+    } else if (ADAPT_INFO.type==='long_missed'){
+      return `<div class="interruption-notice"><strong>Sortie longue manquée la semaine précédente</strong><br>La charge de cette semaine est légèrement réduite pour éviter une surcharge. Reprise progressive recommandée.</div>`;
+    }
+    return '';
+  }
+
+  function sessionCheckMarkup(weekN, type, isoDate){
+    const id=`${weekN}-${type}`;
+    const d=parseISO(isoDate);
+    const isFuture=d> TODAY;
+    const done=!!doneMap[id];
+    const isPastMissed= d < TODAY && !done;
+    let wrapClass='session-check';
+    let status='';
+    if (done){wrapClass+=' is-done'; status='<span class="check-status check-status--done">✓ Réalisée</span>';}
+    else if (isPastMissed){wrapClass+=' is-missed'; status='<span class="check-status check-status--missed">✗ Manquée</span>';}
+    else if (isFuture){wrapClass+=' is-future'; status='<span class="check-status check-status--future">À venir le '+esc(fmtDateShort(isoDate))+'</span>';}
+    else {status='<span class="check-status">À valider aujourd\'hui</span>';}
+    const disabled=isFuture?' disabled':'';
+    const checked=done?' checked':'';
+    return `<div class="${wrapClass}"><label class="check-label"><input type="checkbox" data-done-toggle="${esc(id)}"${checked}${disabled}><span class="check-box" aria-hidden="true"></span><span>Marquer réalisée</span></label>${status}</div>`;
+  }
+
+  function adaptBanner(week){
+    if (!week._adapted) return '';
+    return `<div class="adapt-banner"><strong>Programme adapté ·</strong> ${esc(week._adaptNote||'Volume ajusté')}${week._originalTotalMin? ` · <span>${fmtDur(week._originalTotalMin)} → ${fmtDur(week.totalMin)}</span>`:''}</div>`;
+  }
+
+  function sessionCardClass(week, type, isoDate){
+    const id=`${week.n}-${type}`;
+    const d=parseISO(isoDate);
+    const done=!!doneMap[id];
+    const isFuture=d> TODAY;
+    const isMissed=d< TODAY && !done;
+    let cls='';
+    if (done) cls+=' is-done';
+    else if (isMissed) cls+=' is-missed';
+    else if (isFuture) cls+=' is-future';
+    return cls;
+  }
+
+  function outsidePeriodNotice(){
+    if (isPlanPeriod()) return '';
+    if (TODAY < PLAN_START){
+      return `<div class="outside-notice"><strong>Programme à venir</strong> · Le plan débute le ${esc(fmtDateMed(D.meta.planStart))}. Vous consultez la première semaine.</div>`;
+    }
+    if (TODAY > RACE_DATE){
+      return `<div class="outside-notice"><strong>Programme terminé</strong> · Le marathon était le ${esc(fmtDateMed(D.meta.raceDate))}. Vous consultez la dernière semaine.</div>`;
+    }
+    return '';
   }
 
   function fmtWeekday(iso) {
@@ -2136,7 +2470,8 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
   function longCard(week) {
     if (week.isRace) return raceCard(week);
     const long = week.long;
-    return '<article class="session-card session-card--long">'
+    const cls = sessionCardClass(week,'long',long.date);
+    return '<article class="session-card session-card--long'+cls+'">'
       + '<div class="session-top"><div>'
       + '<p class="session-kind"><span class="kind-dot"></span>Course à pied · séance clé</p>'
       + '<h3 class="session-title">Sortie longue</h3></div>' + dateBox(long.date) + '</div>'
@@ -2160,33 +2495,16 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
       + detailItem('Terrain', long.terrain, true)
       + detailItem('Hydratation', long.hydration, true)
       + detailItem('Glucides', week.carb, true)
-      + '</div></div></article>';
-  }
-
-  function raceCard(week) {
-    const target = D.course.targets.find(item => item.sec === state.raceTarget) || D.course.targets[0];
-    return '<article class="session-card session-card--race">'
-      + '<div class="session-top"><div>'
-      + '<p class="session-kind"><span class="kind-dot"></span>Course à pied · jour J</p>'
-      + '<h3 class="session-title">Marathon du Vercors</h3></div>' + dateBox(week.long.date) + '</div>'
-      + chipList(['42,195 km', '+550 m', 'Départ 08:00', 'Villard-de-Lans'])
-      + metricsBlock([
-        ['Objectif', fmtRaceTime(target.sec)],
-        ['Allure moyenne', fmtPace(target.pace * 60) + '/km'],
-        ['Barrière Autrans', '11:00'],
-        ['Barrière Lans', '14:00'],
-        ['Fermeture', '15:30']
-      ])
-      + chartPanel('Profil du parcours', 'schéma indicatif · Croix Perrin', 'data-chart="race-profile"')
-      + '<div class="race-callout"><h3>Décision de course</h3><p>' + esc(D.course.decision) + '</p>'
-      + '<p class="race-cta"><button type="button" class="btn btn--ghost" data-tab="reperes">' + ICON_ARROW + '<span>Voir la stratégie complète</span></button></p></div>'
-      + '<p class="footnote">Profil non publié par l’organisation : le tracé ci-dessus est un schéma d’après les repères connus.</p>'
+      + '</div></div>'
+      + adaptBanner(week)
+      + sessionCheckMarkup(week.n,'long',long.date)
       + '</article>';
   }
 
   function shortCard(week) {
     const short = week.short;
-    return '<article class="session-card">'
+    const cls = sessionCardClass(week,'short',short.date);
+    return '<article class="session-card'+cls+'">'
       + '<div class="session-top"><div>'
       + '<p class="session-kind"><span class="kind-dot"></span>Course à pied · séance de soutien</p>'
       + '<h3 class="session-title">' + esc(short.name) + '</h3></div>' + dateBox(short.date) + '</div>'
@@ -2202,12 +2520,15 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
       ])
       + chartPanel('Profil de la séance', 'durée par zone', 'data-chart="run-profile"')
       + runSteps(short.segments)
+      + adaptBanner(week)
+      + sessionCheckMarkup(week.n,'short',short.date)
       + '</article>';
   }
 
   function bikeCard(week) {
     const bike = week.bike;
-    return '<article class="session-card session-card--bike">'
+    const cls = sessionCardClass(week,'bike',bike.date);
+    return '<article class="session-card session-card--bike'+cls+'">'
       + '<div class="session-top"><div>'
       + '<p class="session-kind"><span class="kind-dot"></span>Vélo · home trainer MyWhoosh</p>'
       + '<h3 class="session-title">' + esc(bike.name) + '</h3></div>' + dateBox(bike.date) + '</div>'
@@ -2226,6 +2547,8 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
       + bikeSteps(bike.segments)
       + '<p class="footnote">Fichier : ' + esc(bike.file) + '. Les séries MyWhoosh ne prescrivent pas de FC : la cible est la puissance relative (% Pref) et le RPE. '
       + (state.pref ? '' : 'Renseignez votre Pref dans l’onglet Zones pour voir les watts.') + '</p>'
+      + adaptBanner(week)
+      + sessionCheckMarkup(week.n,'bike',bike.date)
       + '</article>';
   }
 
@@ -2247,14 +2570,19 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
   function viewWeek(week) {
     const phase = phaseForWeek(week);
     const accent = week.isRace ? 'var(--orange)' : phase.color;
+    const curWeekNum = (function(){ const diff=Math.floor((TODAY - parseISO(D.meta.planStart))/DAY_MS); return clamp(Math.floor(diff/7)+1,1,32); })();
+    const isCurrent = week.n===curWeekNum;
+    const isCurrentBadge = isCurrent ? '<span class="current-week-badge"><i></i>Semaine actuelle</span>' : '';
     return weekToolbar(week)
+      + outsidePeriodNotice()
+      + (ADAPT_INFO && week.n===ADAPT_INFO.curWeekNum ? interruptionNotice() : '')
       + '<article class="week-hero" style="--hero-accent:' + accent + '">'
       + '<div class="bib"><span class="bib-label">Semaine</span><span class="bib-num">' + pad2(week.n) + '</span>'
       + '<span class="bib-phase">' + esc(week.phaseName) + '</span></div>'
       + '<div class="hero-copy"><p class="hero-dates">'
       + '<span>' + esc(fmtWeekRange(week)) + '</span>'
       + '<span class="phase-chip" style="--pc:' + phase.color + '"><i></i>Phase ' + phase.num + ' · ' + esc(phase.name) + '</span>'
-      + badgeForWeek(week) + '</p>'
+      + badgeForWeek(week) + isCurrentBadge + '</p>'
       + '<h1 class="hero-title" id="view-title" tabindex="-1">' + esc(weekTitle(week)) + '</h1>'
       + '<p class="hero-sub">' + esc(weekSubtitle(week)) + '</p>'
       + '<ul class="hero-tags">'
@@ -2263,12 +2591,13 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
       + '<li class="tag">D+ ' + nf0.format(week.long.dplus) + ' m</li>'
       + (week.isRecovery ? '<li class="tag tag--alert">Semaine allégée</li>' : '')
       + (week.isTest ? '<li class="tag tag--alert">Test 5 km</li>' : '')
+      + (week._adapted ? '<li class="tag tag--alert">Adapté</li>' : '')
       + '</ul></div>'
       + '<div class="hero-side"><div class="countdown">'
       + '<span class="countdown-num">' + esc(countdownForWeek(week)) + '</span>'
       + '<span class="countdown-label">' + (week.isRace ? 'le <strong>marathon du Vercors</strong>' : 'avant le <strong>marathon du Vercors</strong>') + '</span></div>'
       + '<div class="hero-stats">'
-      + '<div class="hero-stat"><span>Charge</span><strong>' + esc(fmtDur(week.totalMin)) + '</strong></div>'
+      + '<div class="hero-stat"><span>Charge</span><strong>' + esc(fmtDur(week.totalMin)) + '</strong>' + (week._originalTotalMin ? '<small style="display:block;color:var(--faint);font-size:.68rem;text-decoration:line-through">'+esc(fmtDur(week._originalTotalMin))+'</small>' : '') + '</div>'
       + '<div class="hero-stat"><span>Course</span><strong>' + esc(fmtKm(week.km[0])) + '–' + esc(fmtKm(week.km[1])) + ' <small>km</small></strong></div>'
       + '<div class="hero-stat"><span>Dénivelé</span><strong>' + nf0.format(week.long.dplus) + ' <small>m D+</small></strong></div>'
       + '</div></div></article>'
@@ -2280,7 +2609,7 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
       + '</div>'
       + '<section class="ridge-panel" aria-labelledby="ridge-title">'
       + '<div class="panel-head"><div><h2 id="ridge-title">Charge des 32 semaines</h2>'
-      + '<p class="panel-sub">Cliquez une semaine pour l’ouvrir. Total course + vélo, marathon inclus en S32.</p></div>'
+      + '<p class="panel-sub">Cliquez une semaine pour l’ouvrir. Total course + vélo, marathon inclus en S32.' + (ADAPT_INFO ? ' · <strong style="color:var(--orange)">Programme adapté affiché</strong>' : '') + '</p></div>'
       + '<div class="legend">' + PHASES.map(item => '<span><i style="--c:' + item.color + '"></i>' + esc(item.name) + '</span>').join('') + '</div></div>'
       + '<div class="chart" data-chart="ridge"></div>'
       + '<p class="chart-note">Hauteur = minutes prescrites. Le repère orange marque la semaine affichée.</p>'
@@ -2288,6 +2617,7 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
       + '<section class="section" aria-labelledby="sessions-title">'
       + '<div class="section-head"><h2 id="sessions-title">Les séances de la semaine</h2>'
       + '<p class="aside">3 séances · ' + esc(fmtDur(week.totalMin)) + ' au total</p></div>'
+      + weekProgressMarkup(week)
       + longCard(week)
       + '<div class="sessions-support">' + shortCard(week) + bikeCard(week) + '</div>'
       + '</section>'
@@ -2298,7 +2628,7 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
       + '<div class="zone-legends">' + zoneLegend('Course', week.zoneMinRun) + zoneLegend('Vélo', week.zoneMinBike) + '</div>'
       + (week.isRace ? '<p class="footnote">Le marathon (210 min) est exclu de cette répartition pour ne pas écraser l’échelle.</p>' : '')
       + '</div>'
-      + '<div class="note-panel"><h3>À retenir</h3><ul class="note-list">' + weekNotes(week) + '</ul></div>'
+      + '<div class="note-panel"><h3>À retenir</h3><ul class="note-list">' + weekNotes(week) + '</ul>' + (week._adapted ? '<p class="callout" style="margin-top:12px"><strong>Adaptation coach.</strong> '+esc(week._adaptNote||'Volume ajusté pour reprise progressive')+' · Pas de rattrapage brutal, progression protégée, semaines allégées et affûtage préservés.</p>' : '') + '</div>'
       + '</div>'
       + weekPager(week);
   }
@@ -2825,7 +3155,36 @@ window.COACH_DATA = {"meta":{"title":"Vercors 2027","subtitle":"Préparation mar
   });
 
   document.addEventListener('change', event => {
-    const select = event.target;
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.matches('[data-done-toggle]')){
+      const id = target.dataset.doneToggle;
+      const checked = target.checked;
+      const parts = id.split('-');
+      const weekN = Number(parts[0]);
+      const type = parts.slice(1).join('-');
+      const origWeek = ORIGINAL_WEEKS.find(w=>w.n===weekN);
+      if (!origWeek){ return; }
+      const iso = origWeek[type] && origWeek[type].date;
+      if (!iso){ return; }
+      const d = parseISO(iso);
+      if (d > TODAY){
+        target.checked=false;
+        toast('Séance future : validation impossible avant le jour J.');
+        return;
+      }
+      if (checked) doneMap[id]=true;
+      else delete doneMap[id];
+      store.set('vercors2027:done', doneMap);
+      const result = buildAdaptedPlan(ORIGINAL_WEEKS, doneMap, TODAY);
+      WEEKS = result.weeks;
+      WEEK_BY_N = new Map(WEEKS.map(w=>[w.n,w]));
+      ADAPT_INFO = result.interruption;
+      render({ scroll: null });
+      toast(checked ? 'Séance validée ✓' : 'Séance décochée');
+      return;
+    }
+    const select = target;
     if (!(select instanceof Element) || select.id !== 'week-select') return;
     const number = Number(select.value);
     if (!Number.isInteger(number) || number < 1 || number > 32 || number === state.week) return;
